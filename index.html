@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>คลังสื่อการสอนออนไลน์ | Teaching Media Hub</title>
+    <!-- เพิ่ม Google Fonts: Sarabun ตรงนี้ -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* =========================================
            CSS Variables & Base Styles
@@ -38,8 +40,8 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            /* เปลี่ยน Font ให้เป็น Apple System Font แบบ Native แท้ๆ */
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            /* เปลี่ยน Font ให้เป็น Sarabun */
+            font-family: 'Sarabun', sans-serif;
         }
 
         body {
@@ -667,19 +669,28 @@
         async function apiRequest(action, data = null) {
             try {
                 let url = `${SCRIPT_URL}?action=${action}`;
-                let options = { method: 'GET' };
+                let options = { 
+                    method: 'GET',
+                    redirect: 'follow' // ช่วยแก้ปัญหา Failed to fetch จาก Redirect
+                };
 
                 // For Apps script CORS handling, complex POST needs care.
                 // Using standard POST with JSON.
                 if (data) {
                     options = {
                         method: 'POST',
+                        redirect: 'follow', // ช่วยแก้ปัญหา Failed to fetch จาก Redirect
                         body: JSON.stringify(data),
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' } // 'text/plain' avoids preflight OPTIONS request issues in GAS
                     };
                 }
 
                 const response = await fetch(url, options);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const result = await response.json();
                 
                 if(result.status === 'success') {
@@ -689,7 +700,11 @@
                 }
             } catch (error) {
                 console.error("API Error:", error);
-                showToast("เกิดข้อผิดพลาด: " + error.message, "error");
+                if (error.message.includes('Failed to fetch')) {
+                    showToast("ข้อผิดพลาดเครือข่าย: กรุณาตรวจสอบ URL ของ Apps Script หรือสิทธิ์การเข้าถึง", "error");
+                } else {
+                    showToast("เกิดข้อผิดพลาด: " + error.message, "error");
+                }
                 return null;
             }
         }
