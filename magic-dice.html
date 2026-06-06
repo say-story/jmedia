@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ลูกเต๋าวิเศษ - Magic Dice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --table-green: #1a472a;
+            --gold: #ffd700;
+            --dice-white: #ffffff;
+            --font-main: 'Sarabun', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-main);
+            background: radial-gradient(circle, #2d5a3c 0%, #1a3322 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-area h1 { font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+
+        .scoreboard { text-align: right; }
+        .stars { color: var(--gold); font-size: 24px; }
+
+        /* Game Modes */
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .btn-mode {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 2px solid var(--gold);
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-mode.active {
+            background: var(--gold);
+            color: black;
+        }
+
+        /* Dice 3D Area */
+        .dice-container {
+            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            gap: 50px;
+        }
+
+        .scene {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+
+        .dice {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1.5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+
+        .dice-face {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: white;
+            border: 2px solid #ccc;
+            border-radius: 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            padding: 10px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        /* Dice Dots */
+        .dot {
+            width: 18px;
+            height: 18px;
+            background: #222;
+            border-radius: 50%;
+            align-self: center;
+            justify-self: center;
+        }
+        .dot.red { background: #d00; }
+
+        /* Positioning Faces */
+        .face-1 { transform: rotateY(0deg) translateZ(50px); }
+        .face-2 { transform: rotateY(90deg) translateZ(50px); }
+        .face-3 { transform: rotateX(90deg) translateZ(50px); }
+        .face-4 { transform: rotateX(-90deg) translateZ(50px); }
+        .face-5 { transform: rotateY(-90deg) translateZ(50px); }
+        .face-6 { transform: rotateY(180deg) translateZ(50px); }
+
+        /* Controls */
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-roll {
+            background: linear-gradient(to bottom, #ff416c, #ff4b2b);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #9e1a00;
+            transition: 0.1s;
+            font-family: var(--font-main);
+        }
+
+        .btn-roll:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #9e1a00;
+        }
+
+        .btn-roll:disabled { background: #777; box-shadow: none; cursor: default; }
+
+        /* Answer Grid */
+        .answer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            gap: 15px;
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .btn-answer {
+            background: #fff;
+            color: #1a3322;
+            border: none;
+            padding: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 0 #ccc;
+        }
+
+        .btn-answer:hover { background: var(--gold); }
+        .btn-answer:disabled { opacity: 0.5; cursor: default; }
+
+        /* Feedback & Message */
+        #feedback-area {
+            height: 60px;
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .thai-num { font-size: 28px; color: var(--gold); }
+
+        /* History */
+        .history {
+            max-width: 400px;
+            margin: 10px auto;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            padding: 15px;
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* Animations */
+        @keyframes star-burst {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+
+        .star-burst {
+            position: fixed;
+            pointer-events: none;
+            color: var(--gold);
+            z-index: 100;
+            animation: star-burst 0.8s ease-out forwards;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .shake { animation: shake 0.2s 3; }
+
+        .streak-bonus {
+            color: #ff4b2b;
+            font-size: 18px;
+            animation: bounce 0.5s infinite alternate;
+        }
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+        /* Dot Patterns */
+        .dot-1 { grid-area: 2 / 2; }
+        .dot-2-1 { grid-area: 1 / 1; } .dot-2-2 { grid-area: 3 / 3; }
+        .dot-3-1 { grid-area: 1 / 1; } .dot-3-2 { grid-area: 2 / 2; } .dot-3-3 { grid-area: 3 / 3; }
+        .dot-4-1 { grid-area: 1 / 1; } .dot-4-2 { grid-area: 1 / 3; } .dot-4-3 { grid-area: 3 / 1; } .dot-4-4 { grid-area: 3 / 3; }
+        .dot-5-1 { grid-area: 1 / 1; } .dot-5-2 { grid-area: 1 / 3; } .dot-5-3 { grid-area: 2 / 2; } .dot-5-4 { grid-area: 3 / 1; } .dot-5-5 { grid-area: 3 / 3; }
+        .dot-6-1 { grid-area: 1 / 1; } .dot-6-2 { grid-area: 1 / 3; } .dot-6-3 { grid-area: 2 / 1; } .dot-6-4 { grid-area: 2 / 3; } .dot-6-5 { grid-area: 3 / 1; } .dot-6-6 { grid-area: 3 / 3; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <img src="https://img1.pic.in.th/images/sayremove1.png" style="height:36px;" alt="logo">
+            <h1>ลูกเต๋าวิเศษ</h1>
+        </div>
+        <div class="scoreboard">
+            <div>คะแนน: <span id="score">0</span></div>
+            <div class="stars">⭐ <span id="star-count">0</span></div>
+            <div id="streak-msg" class="streak-bonus" style="display:none;">Combo x<span id="streak-num">0</span>!</div>
+        </div>
+    </header>
+
+    <div class="mode-selector">
+        <button class="btn-mode active" onclick="setMode(1)">ลูกเต๋า 1 ลูก</button>
+        <button class="btn-mode" onclick="setMode(2)">ลูกเต๋า 2 ลูก</button>
+    </div>
+
+    <div id="feedback-area"></div>
+
+    <div class="dice-container" id="dice-container">
+        <div class="scene">
+            <div class="dice" id="dice-1">
+                <div class="dice-face face-1"><div class="dot red dot-1"></div></div>
+                <div class="dice-face face-2"><div class="dot dot-2-1"></div><div class="dot dot-2-2"></div></div>
+                <div class="dice-face face-3"><div class="dot dot-3-1"></div><div class="dot dot-3-2"></div><div class="dot dot-3-3"></div></div>
+                <div class="dice-face face-4"><div class="dot dot-4-1"></div><div class="dot dot-4-2"></div><div class="dot dot-4-3"></div><div class="dot dot-4-4"></div></div>
+                <div class="dice-face face-5"><div class="dot dot-5-1"></div><div class="dot dot-5-2"></div><div class="dot dot-5-3"></div><div class="dot dot-5-4"></div><div class="dot dot-5-5"></div></div>
+                <div class="dice-face face-6"><div class="dot dot-6-1"></div><div class="dot dot-6-2"></div><div class="dot dot-6-3"></div><div class="dot dot-6-4"></div><div class="dot dot-6-5"></div><div class="dot dot-6-6"></div></div>
+            </div>
+        </div>
+        <div class="scene" id="scene-2" style="display:none;">
+            <div class="dice" id="dice-2">
+                <div class="dice-face face-1"><div class="dot red dot-1"></div></div>
+                <div class="dice-face face-2"><div class="dot dot-2-1"></div><div class="dot dot-2-2"></div></div>
+                <div class="dice-face face-3"><div class="dot dot-3-1"></div><div class="dot dot-3-2"></div><div class="dot dot-3-3"></div></div>
+                <div class="dice-face face-4"><div class="dot dot-4-1"></div><div class="dot dot-4-2"></div><div class="dot dot-4-3"></div><div class="dot dot-4-4"></div></div>
+                <div class="dice-face face-5"><div class="dot dot-5-1"></div><div class="dot dot-5-2"></div><div class="dot dot-5-3"></div><div class="dot dot-5-4"></div><div class="dot dot-5-5"></div></div>
+                <div class="dice-face face-6"><div class="dot dot-6-1"></div><div class="dot dot-6-2"></div><div class="dot dot-6-3"></div><div class="dot dot-6-4"></div><div class="dot dot-6-5"></div><div class="dot dot-6-6"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-roll" id="roll-btn" onclick="rollDice()">ทอยลูกเต๋า!</button>
+    </div>
+
+    <div class="answer-grid" id="answer-grid">
+        </div>
+
+    <div class="history">
+        ประวัติ: <span id="history-list">ยังไม่มีการเล่น</span>
+    </div>
+
+    <footer>
+        Designed & Developed by Mansay.h © 2026
+    </footer>
+
+    <script>
+        // Game State
+        let numDice = 1;
+        let score = 0;
+        let stars = 0;
+        let streak = 0;
+        let currentResult = 0;
+        let isRolling = false;
+        let history = [];
+
+        const thaiNums = ['๐','๑','๒','๓','๔','๕','๖','๗','๘','๙','๑๐','๑๑','๑๒'];
+        const thaiWords = ['ศูนย์','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด','เก้า','สิบ','สิบเอ็ด','สิบสอง'];
+
+        // Sound Synthesis (Web Audio API)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(freq, type, duration, vol=0.1) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        const sounds = {
+            roll: () => {
+                let i = 0;
+                let interval = setInterval(() => {
+                    playSound(200 + Math.random() * 300, 'square', 0.05, 0.05);
+                    if(++i > 10) clearInterval(interval);
+                }, 100);
+            },
+            correct: () => {
+                playSound(523.25, 'sine', 0.2); // C5
+                setTimeout(() => playSound(659.25, 'sine', 0.2), 100); // E5
+                setTimeout(() => playSound(783.99, 'sine', 0.4), 200); // G5
+            },
+            wrong: () => {
+                playSound(220, 'sawtooth', 0.5); // A3
+            },
+            bonus: () => {
+                playSound(880, 'sine', 0.1); playSound(1046, 'sine', 0.1);
+                playSound(1318, 'sine', 0.3);
+            }
+        };
+
+        // Initialize Answer Buttons
+        function createButtons() {
+            const grid = document.getElementById('answer-grid');
+            grid.innerHTML = '';
+            for (let i = 0; i <= 12; i++) {
+                let btn = document.createElement('button');
+                btn.className = 'btn-answer';
+                btn.innerText = i;
+                btn.onclick = () => checkAnswer(i);
+                btn.disabled = true;
+                grid.appendChild(btn);
+            }
+        }
+
+        function setMode(m) {
+            if(isRolling) return;
+            numDice = m;
+            document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('scene-2').style.display = (m === 2) ? 'block' : 'none';
+            resetDice();
+        }
+
+        function resetDice() {
+            document.getElementById('dice-1').style.transform = `rotateX(0deg) rotateY(0deg)`;
+            document.getElementById('dice-2').style.transform = `rotateX(0deg) rotateY(0deg)`;
+            document.getElementById('feedback-area').innerText = '';
+        }
+
+        const rotationMap = {
+            1: {x: 0, y: 0},
+            2: {x: 0, y: -90},
+            3: {x: -90, y: 0},
+            4: {x: 90, y: 0},
+            5: {x: 0, y: 90},
+            6: {x: 0, y: 180}
+        };
+
+        function rollDice() {
+            if(isRolling) return;
+            isRolling = true;
+            sounds.roll();
+            
+            document.getElementById('roll-btn').disabled = true;
+            document.querySelectorAll('.btn-answer').forEach(b => b.disabled = true);
+            document.getElementById('feedback-area').innerText = "นับจุด... รอก่อนนะ";
+
+            const r1 = Math.floor(Math.random() * 6) + 1;
+            const r2 = (numDice === 2) ? Math.floor(Math.random() * 6) + 1 : 0;
+            currentResult = r1 + r2;
+
+            // Animate Dice
+            animateSingleDice('dice-1', r1);
+            if(numDice === 2) animateSingleDice('dice-2', r2);
+
+            setTimeout(() => {
+                isRolling = false;
+                document.getElementById('feedback-area').innerText = "ได้เท่าไหร่เอ่ย?";
+                document.querySelectorAll('.btn-answer').forEach((b, idx) => {
+                    if(numDice === 1 && idx > 6) b.disabled = true;
+                    else if(numDice === 2 && idx < 2) b.disabled = true;
+                    else b.disabled = false;
+                });
+            }, 1600);
+        }
+
+        function animateSingleDice(id, result) {
+            const dice = document.getElementById(id);
+            const extraRots = 4 * 360; // 4 full spins
+            const target = rotationMap[result];
+            dice.style.transform = `rotateX(${target.x + extraRots}deg) rotateY(${target.y + extraRots}deg)`;
+        }
+
+        function checkAnswer(val) {
+            const feedback = document.getElementById('feedback-area');
+            document.querySelectorAll('.btn-answer').forEach(b => b.disabled = true);
+            
+            if (val === currentResult) {
+                // Correct
+                sounds.correct();
+                createStars(event.clientX, event.clientY);
+                streak++;
+                score += 10 * (streak > 2 ? 2 : 1);
+                if(streak === 3) {
+                    sounds.bonus();
+                    stars += 1;
+                    document.getElementById('streak-msg').style.display = 'block';
+                    document.getElementById('streak-num').innerText = streak;
+                }
+                
+                feedback.innerHTML = `<span style="color:#ffd700">เก่งมาก!</span> ${val} = ${thaiNums[val]} = ${thaiWords[val]}`;
+                updateHistory('✓');
+            } else {
+                // Wrong
+                sounds.wrong();
+                streak = 0;
+                document.getElementById('streak-msg').style.display = 'none';
+                document.getElementById('dice-container').classList.add('shake');
+                setTimeout(() => document.getElementById('dice-container').classList.remove('shake'), 600);
+                
+                feedback.innerHTML = `<span style="color:#ff4b2b">ลองใหม่นะ!</span> เฉลยคือ ${currentResult} (${thaiWords[currentResult]})`;
+                updateHistory('✗');
+            }
+
+            document.getElementById('score').innerText = score;
+            document.getElementById('star-count').innerText = stars;
+            document.getElementById('roll-btn').disabled = false;
+            document.getElementById('roll-btn').innerText = "ทอยใหม่";
+        }
+
+        function updateHistory(symbol) {
+            history.unshift(symbol);
+            if(history.length > 5) history.pop();
+            document.getElementById('history-list').innerText = history.join(' ');
+        }
+
+        function createStars(x, y) {
+            for(let i=0; i<10; i++) {
+                const star = document.createElement('div');
+                star.className = 'star-burst';
+                star.innerHTML = '★';
+                star.style.left = x + 'px';
+                star.style.top = y + 'px';
+                star.style.transform = `rotate(${Math.random()*360}deg)`;
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), 800);
+            }
+        }
+
+        // Init
+        createButtons();
+    </script>
+</body>
+</html>
