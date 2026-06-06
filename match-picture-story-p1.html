@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>อ่านแล้วจับคู่ให้ถูก! - สื่อการสอนภาษาไทย ป.1</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700;800&display=swap');
+
+        :root {
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
+            --secondary: #fbbf24;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #1e293b;
+            --text-light: #475569;
+            --bg-start: #fef08a; /* Yellow-200 */
+            --bg-end: #ffedd5; /* Orange-100 */
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-main);
+        }
+
+        /* Header Style */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 12px 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            height: 55px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .title-container h1 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            line-height: 1.2;
+        }
+
+        .indicator-badge {
+            margin: 2px 0 0 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #d97706;
+            background-color: #fef3c7;
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            border: 1px solid #fde68a;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .status-badge {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .status-badge.score {
+            border-color: var(--primary);
+            color: var(--primary-dark);
+        }
+
+        .status-badge.stars {
+            border-color: #fde047;
+            color: #a16207;
+        }
+
+        /* Main Content Container */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 20px;
+        }
+
+        .game-card {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 35px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 4px solid #fff;
+        }
+
+        /* Screens */
+        .screen { display: none; }
+        .screen.active { 
+            display: block; 
+            animation: fadeIn 0.5s ease-in-out; 
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Start Screen */
+        .welcome-emoji {
+            font-size: 80px;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .instruction-box {
+            background-color: #fffbeb;
+            border: 2px dashed #fcd34d;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .instruction-box h3 {
+            margin-top: 0;
+            color: #b45309;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .instruction-box ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #78350f;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 25px;
+            background: #f1f5f9;
+            border-radius: 20px;
+            padding: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 6px;
+            padding: 0 10px;
+        }
+
+        .progress-bar-outer {
+            width: 100%;
+            background: #e2e8f0;
+            height: 18px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        /* Question Box */
+        .question-box {
+            background-color: #f8fafc;
+            border: 3px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 25px 20px;
+            margin-bottom: 30px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .question-text {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        /* Emoji Grid */
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .emoji-btn {
+            background-color: #ffffff;
+            border: 3px solid #cbd5e1;
+            border-radius: 20px;
+            height: 120px;
+            font-size: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .emoji-btn:hover:not(:disabled) {
+            transform: scale(1.08) translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 15px rgba(245, 158, 11, 0.2);
+        }
+
+        .emoji-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .emoji-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Result Styles */
+        .emoji-btn.correct {
+            background-color: #d1fae5;
+            border-color: var(--success);
+            animation: popCorrect 0.5s ease;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+            z-index: 10;
+        }
+
+        .emoji-btn.incorrect {
+            background-color: #fee2e2;
+            border-color: var(--danger);
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        @keyframes popCorrect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Feedback Section */
+        .feedback-container {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 22px;
+            font-weight: 700;
+            display: none;
+            animation: slideUp 0.3s ease-out;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-direction: column;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback-container.show-correct {
+            display: flex;
+            background-color: #d1fae5;
+            color: #047857;
+            border: 2px solid #34d399;
+        }
+
+        .feedback-container.show-incorrect {
+            display: flex;
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 2px solid #f87171;
+        }
+
+        /* Buttons Styling */
+        .btn {
+            background: linear-gradient(180deg, #fcd34d 0%, #f59e0b 100%);
+            color: #78350f;
+            border: none;
+            padding: 16px 40px;
+            font-size: 24px;
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-next {
+            background: linear-gradient(180deg, #6ee7b7 0%, #10b981 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            margin-top: 15px;
+        }
+
+        .btn-next:hover {
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+        }
+
+        /* Summary Screen */
+        .summary-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        .summary-subtitle {
+            font-size: 20px;
+            color: var(--text-light);
+            margin-bottom: 25px;
+        }
+
+        .score-board {
+            background: #fffbeb;
+            border: 3px solid #fde68a;
+            padding: 25px;
+            border-radius: 20px;
+            margin: 25px auto;
+            max-width: 450px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .score-box {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid #fef3c7;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .score-box .val {
+            font-size: 36px;
+            font-weight: 800;
+            color: #d97706;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .score-box .lbl {
+            font-size: 18px;
+            color: #78350f;
+            font-weight: 700;
+        }
+
+        /* Footer Style */
+        footer {
+            text-align: center;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-top: 1px solid rgba(0,0,0,0.05);
+            font-size: 16px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 768px) {
+            .emoji-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2x2 grid on mobile */
+                gap: 15px;
+            }
+            .emoji-btn {
+                height: 100px;
+                font-size: 50px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                gap: 12px;
+                padding: 12px;
+                text-align: center;
+            }
+            .header-left {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .game-card {
+                padding: 20px 15px;
+                border-radius: 20px;
+            }
+            .question-text {
+                font-size: 26px;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .score-board {
+                grid-template-columns: 1fr;
+            }
+            .welcome-emoji {
+                font-size: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="https://img1.pic.in.th/images/sayremove1.png" alt="Logo" class="logo">
+            <div class="title-container">
+                <h1>อ่านแล้วจับคู่ให้ถูก!</h1>
+                <div class="indicator-badge">ตัวชี้วัด ท ๑.๑ ป.๑/๓</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-badge score">
+                <span>คะแนน:</span>
+                <span id="header-score">0</span>
+            </div>
+            <div class="status-badge stars">
+                <span>⭐</span>
+                <span id="header-stars">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="game-card">
+            
+            <div id="start-screen" class="screen active">
+                <div class="welcome-emoji">🎯✨</div>
+                <h2 style="font-size: 32px; color: #b45309; margin-bottom: 10px;">ยินดีต้อนรับคนเก่ง!</h2>
+                <p style="font-size: 22px; color: #78350f;">เกมฝึกจับคู่ประโยคกับภาพ สำหรับนักเรียนชั้น ป.1</p>
+                
+                <div class="instruction-box">
+                    <h3>💡 วิธีเล่นเกม:</h3>
+                    <ul>
+                        <li>อ่านประโยคที่อยู่ในกล่องสีขาวให้เข้าใจ</li>
+                        <li>ดูรูปภาพ (Emoji) ทั้ง 4 รูปด้านล่าง</li>
+                        <li>ใช้นิ้วจิ้มหรือคลิกเลือกรูปภาพที่ตรงกับประโยคที่สุด</li>
+                        <li>สะสมคะแนนและดวงดาวให้ได้เยอะๆ นะครับ/ค่ะ!</li>
+                    </ul>
+                </div>
+                
+                <button class="btn" onclick="startGame()">เริ่มเล่นเกมเลย! 🚀</button>
+            </div>
+
+            <div id="game-screen" class="screen">
+                <div class="progress-container">
+                    <div class="progress-text">
+                        <span>ความคืบหน้า</span>
+                        <span id="progress-text">ข้อ 1 / 12</span>
+                    </div>
+                    <div class="progress-bar-outer">
+                        <div id="progress-bar" class="progress-bar-inner"></div>
+                    </div>
+                </div>
+
+                <div class="question-box">
+                    <p class="question-text" id="question-text">ประโยคจะแสดงที่นี่</p>
+                </div>
+
+                <div class="emoji-grid" id="emoji-grid">
+                    </div>
+
+                <div id="feedback-box" class="feedback-container">
+                    <span id="feedback-text">ข้อความ</span>
+                    <button id="next-btn" class="btn btn-next" onclick="nextQuestion()">ไปข้อต่อไป ➡️</button>
+                </div>
+            </div>
+
+            <div id="summary-screen" class="screen">
+                <div class="welcome-emoji">🏆🎉</div>
+                <h2 class="summary-title">เก่งมากๆ เลย!</h2>
+                <p class="summary-subtitle">หนูเล่นเกมจบครบทุกข้อแล้ว มาดูคะแนนกันเถอะ</p>
+                
+                <div class="score-board">
+                    <div class="score-box">
+                        <span class="val" id="summary-score">0</span>
+                        <span class="lbl">คะแนนรวม</span>
+                    </div>
+                    <div class="score-box">
+                        <span class="val" id="summary-stars">0</span>
+                        <span class="lbl">ดาวที่สะสมได้ ⭐</span>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="restartGame()">เล่นอีกครั้ง 🔄</button>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        Designed & Developed by Mansay.h © 2026
+    </footer>
+
+    <script>
+        // ข้อมูลประโยคและตัวเลือก 12 ชุด
+        const questionData = [
+            { text: "กระต่ายกินแครอทอย่างอร่อย", correct: "🐰", wrong: ["🐟", "🦁", "🐘"] },
+            { text: "ปลาว่ายอยู่ในทะเลใหญ่", correct: "🐟", wrong: ["🐰", "🦋", "🐸"] },
+            { text: "แม่วัวกินหญ้าในทุ่ง", correct: "🐄", wrong: ["🐯", "🐧", "🐺"] },
+            { text: "นกบินอยู่บนท้องฟ้า", correct: "🦅", wrong: ["🐢", "🐊", "🦔"] },
+            { text: "ลิงห้อยโหนบนต้นไม้", correct: "🐒", wrong: ["🐍", "🦀", "🐷"] },
+            { text: "ไก่ขันปลุกตอนเช้า", correct: "🐓", wrong: ["🦉", "🦇", "🐝"] },
+            { text: "ช้างพ่นน้ำเล่นสนุกสนาน", correct: "🐘", wrong: ["🐁", "🐈", "🐩"] },
+            { text: "แมวนอนหลับบนโซฟา", correct: "🐱", wrong: ["🐢", "🦆", "🐴"] },
+            { text: "ผีเสื้อบินตอมดอกไม้", correct: "🦋", wrong: ["🐛", "🐜", "🕷️"] },
+            { text: "กบกระโดดไปมาในสระน้ำ", correct: "🐸", wrong: ["🐌", "🐞", "🦂"] },
+            { text: "หมาเห่าคนแปลกหน้า", correct: "🐶", wrong: ["🐹", "🦊", "🐨"] },
+            { text: "เต่าคลานต้วมเตี้ยมช้าๆ", correct: "🐢", wrong: ["🐆", "🐎", "🦌"] }
+        ];
+
+        let score = 0;
+        let stars = 0;
+        let currentQuestionIndex = 0;
+        let isAnswered = false;
+        let currentOptions = []; // เก็บตัวเลือกที่สุ่มแล้วของข้อปัจจุบัน
+
+        // ฟังก์ชันสลับตำแหน่งอาร์เรย์ (Fisher-Yates Shuffle)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // เริ่มเกม
+        function startGame() {
+            score = 0;
+            stars = 0;
+            currentQuestionIndex = 0;
+            updateHeader();
+            showScreen('game-screen');
+            loadQuestion();
+        }
+
+        // แสดงหน้าจอ
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // อัปเดตคะแนน
+        function updateHeader() {
+            document.getElementById('header-score').innerText = score;
+            document.getElementById('header-stars').innerText = stars;
+        }
+
+        // โหลดคำถาม
+        function loadQuestion() {
+            isAnswered = false;
+            
+            // ซ่อนกล่องข้อความตอบกลับ
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.className = "feedback-container";
+            
+            // ดึงข้อมูลข้อปัจจุบัน
+            const qData = questionData[currentQuestionIndex];
+            
+            // แสดงประโยค
+            document.getElementById('question-text').
