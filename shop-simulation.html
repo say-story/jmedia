@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ร้านขายของจำลอง สำหรับเด็ก</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #FFF3E0;
+            --shop-bg: #FFE0B2;
+            --cart-bg: #FFFFFF;
+            --text-color: #3E2723;
+            --btn-green: #4CAF50;
+            --btn-green-hover: #45a049;
+            --btn-blue: #2196F3;
+            --btn-blue-hover: #1976D2;
+            --btn-red: #F44336;
+            --btn-red-hover: #da190b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background-color: #FFB74D;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-left h1 {
+            font-size: 2rem;
+            color: #fff;
+            text-shadow: 2px 2px 0 #E65100;
+        }
+
+        .coin-board {
+            background-color: #FFF;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #F57C00;
+            border: 3px solid #FF9800;
+        }
+
+        /* Main Content */
+        main {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            gap: 20px;
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Shop Area */
+        .shop-area {
+            flex: 2;
+            min-width: 300px;
+            background-color: var(--shop-bg);
+            border-radius: 20px;
+            padding: 20px;
+            border: 4px dashed #FF9800;
+        }
+
+        .task-board {
+            background-color: #FFF;
+            padding: 15px 20px;
+            border-radius: 15px;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #D84315;
+            box-shadow: 0 4px 0 #FFCC80;
+        }
+
+        .shelf {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+        }
+
+        .product-card {
+            background-color: #FFF;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #E0E0E0;
+            transition: transform 0.1s, box-shadow 0.1s;
+            user-select: none;
+        }
+
+        .product-card:active {
+            transform: translateY(5px);
+            box-shadow: 0 0 0 #E0E0E0;
+        }
+
+        .product-emoji {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        .product-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .product-price {
+            font-size: 1.2rem;
+            color: #666;
+            background-color: #FFF9C4;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+
+        /* Cart Area */
+        .cart-area {
+            flex: 1;
+            min-width: 300px;
+            background-color: var(--cart-bg);
+            border-radius: 20px;
+            padding: 20px;
+            border: 4px solid #81C784;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-title {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #2E7D32;
+        }
+
+        .cart-items {
+            flex: 1;
+            list-style: none;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            min-height: 150px;
+            background-color: #F1F8E9;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .cart-item {
+            font-size: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 2px dashed #C5E1A5;
+        }
+
+        .cart-total {
+            background-color: #E8F5E9;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .total-label {
+            font-size: 1.5rem;
+        }
+
+        .total-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #1B5E20;
+            display: block;
+        }
+
+        /* Buttons */
+        .btn {
+            border: none;
+            padding: 15px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            font-family: inherit;
+            border-radius: 15px;
+            cursor: pointer;
+            color: white;
+            width: 100%;
+            margin-bottom: 10px;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.2);
+            transition: all 0.1s;
+        }
+
+        .btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 0 0 rgba(0,0,0,0.2);
+        }
+
+        .btn-checkout { background-color: var(--btn-green); }
+        .btn-checkout:hover { background-color: var(--btn-green-hover); }
+        
+        .btn-next { background-color: var(--btn-blue); display: none; }
+        .btn-next:hover { background-color: var(--btn-blue-hover); }
+
+        .btn-clear { background-color: var(--btn-red); font-size: 1.4rem; padding: 10px; }
+        .btn-clear:hover { background-color: var(--btn-red-hover); }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #E0E0E0;
+            color: #757575;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        /* Animations */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+        }
+        .shake { animation: shake 0.4s; }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
+        }
+        .bounce { animation: bounce 1s; }
+
+        @media (max-width: 768px) {
+            .header-left h1 { font-size: 1.5rem; }
+            .task-board { font-size: 1.5rem; }
+            .product-emoji { font-size: 3rem; }
+            .btn { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="https://img1.pic.in.th/images/sayremove1.png" style="height:36px;" alt="logo">
+            <h1>ร้านขายของจำลอง</h1>
+        </div>
+        <div class="coin-board">🪙 <span id="coinCount">0</span></div>
+    </header>
+
+    <main>
+        <section class="shop-area">
+            <div class="task-board" id="taskBoard">
+                กำลังเตรียมโจทย์...
+            </div>
+            <div class="shelf" id="shelf">
+                </div>
+        </section>
+
+        <aside class="cart-area" id="cartContainer">
+            <h2 class="cart-title">🛒 ตะกร้าของหนู</h2>
+            <ul class="cart-items" id="cartItemsList">
+                </ul>
+            
+            <div class="cart-total">
+                <span class="total-label">จำนวนของในตะกร้า</span>
+                <span class="total-number" id="totalNumberDisplay">0 / ๐</span>
+            </div>
+
+            <button class="btn btn-checkout" id="btnCheckout" onclick="checkAnswer()">💳 ชำระเงิน</button>
+            <button class="btn btn-next" id="btnNext" onclick="nextRound()">⭐ โจทย์ใหม่</button>
+            <button class="btn btn-clear" id="btnClear" onclick="clearCart()">🗑️ เทของออกจากตะกร้า</button>
+        </aside>
+    </main>
+
+    <footer>
+        Designed & Developed by Mansay.h © 2026
+    </footer>
+
+    <script>
+        // ข้อมูลสินค้า
+        const products = [
+            { id: 'apple', name: 'แอปเปิล', emoji: '🍎', price: 15 },
+            { id: 'banana', name: 'กล้วย', emoji: '🍌', price: 10 },
+            { id: 'juice', name: 'น้ำผลไม้', emoji: '🧃', price: 20 },
+            { id: 'cookie', name: 'คุกกี้', emoji: '🍪', price: 12 },
+            { id: 'balloon', name: 'ลูกโป่ง', emoji: '🎈', price: 5 },
+            { id: 'ruler', name: 'ไม้บรรทัด', emoji: '📏', price: 8 }
+        ];
+
+        // ตัวแปรสถานะเกม
+        let cart = {}; // { productId: count }
+        let totalItemsInCart = 0;
+        let coins = 0;
+        let currentTask = { product: null, targetCount: 0 };
+        let isRoundFinished = false;
+
+        // Web Audio API สำหรับเสียง Effect (ทำงานเมื่อผู้ใช้กดครั้งแรก)
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playTone(freq, type, duration, startTime = 0) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + startTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(audioCtx.currentTime + startTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + startTime + duration);
+            osc.stop(audioCtx.currentTime + startTime + duration);
+        }
+
+        function playPopSound() { initAudio(); playTone(600, 'sine', 0.1); }
+        function playSuccessSound() { 
+            initAudio(); 
+            playTone(400, 'sine', 0.1, 0); 
+            playTone(600, 'sine', 0.1, 0.1); 
+            playTone(800, 'sine', 0.3, 0.2); 
+        }
+        function playErrorSound() { initAudio(); playTone(200, 'sawtooth', 0.3); }
+
+        // ฟังก์ชันแปลงเลขฮินดูอารบิกเป็นเลขไทย
+        function toThaiNum(num) {
+            const thaiNumbers = ['๐', '๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙'];
+            return num.toString().replace(/[0-9]/g, match => thaiNumbers[match]);
+        }
+
+        // สร้างชั้นวางสินค้า
+        function renderShelf() {
+            const shelfDiv = document.getElementById('shelf');
+            shelfDiv.innerHTML = '';
+            products.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.onclick = () => addToCart(p.id);
+                card.innerHTML = `
+                    <div class="product-emoji">${p.emoji}</div>
+                    <div class="product-name">${p.name}</div>
+                    <div class="product-price">${p.price} บาท</div>
+                `;
+                shelfDiv.appendChild(card);
+            });
+        }
+
+        // สุ่มโจทย์ใหม่
+        function generateTask() {
+            const randomProduct = products[Math.floor(Math.random() * products.length)];
+            const randomCount = Math.floor(Math.random() * 5) + 1; // สุ่ม 1-5 ชิ้น สำหรับเด็กเล็ก
+            
+            currentTask = {
+                product: randomProduct,
+                targetCount: randomCount
+            };
+
+            const taskText = `หนูๆ ช่วยหยิบ "${randomProduct.name}" ใส่ตะกร้าจำนวน ${randomCount} ชิ้นหน่อยจ้า`;
+            document.getElementById('taskBoard').innerText = taskText;
+        }
+
+        // เพิ่มลงตะกร้า
+        function addToCart(productId) {
+            if (isRoundFinished) return;
+            
+            playPopSound();
+            
+            if (!cart[productId]) {
+                cart[productId] = 0;
+            }
+            cart[productId]++;
+            totalItemsInCart++;
+            
+            updateCartUI();
+        }
+
+        // เอาของออกจากตะกร้าทั้งหมด
+        function clearCart() {
+            if (isRoundFinished) return;
+            playPopSound();
+            cart = {};
+            totalItemsInCart = 0;
+            updateCartUI();
+        }
+
+        // อัปเดตหน้าจอส่วนตะกร้า
+        function updateCartUI() {
+            const cartList = document.getElementById('cartItemsList');
+            cartList.innerHTML = '';
+            
+            for (const [id, count] of Object.entries(cart)) {
+                const product = products.find(p => p.id === id);
+                if (product) {
+                    const li = document.createElement('li');
+                    li.className = 'cart-item';
+                    li.innerHTML = `<span>${product.emoji} ${product.name}</span> <span>${count} ชิ้น</span>`;
+                    cartList.appendChild(li);
+                }
+            }
+
+            // แสดงเลขคู่ อารบิก / ไทย
+            const totalDisplay = `${totalItemsInCart} / ${toThaiNum(totalItemsInCart)}`;
+            document.getElementById('totalNumberDisplay').innerText = totalDisplay;
+        }
+
+        // ตรวจคำตอบเมื่อกดชำระเงิน
+        function checkAnswer() {
+            if (isRoundFinished || totalItemsInCart === 0) return;
+
+            // ตรวจสอบว่าหยิบถูกชิ้น และ จำนวนถูกต้อง
+            const hasOnlyTargetProduct = Object.keys(cart).length === 1 && cart[currentTask.product.id] !== undefined;
+            const hasCorrectAmount = cart[currentTask.product.id] === currentTask.targetCount;
+
+            const cartContainer = document.getElementById('cartContainer');
+
+            if (hasOnlyTargetProduct && hasCorrectAmount) {
+                // ตอบถูก
+                playSuccessSound();
+                cartContainer.classList.add('bounce');
+                document.getElementById('taskBoard').innerText = "🎉 เก่งมาก! ตอบถูกต้องจ้า 🎉";
+                document.getElementById('taskBoard').style.color = "#2E7D32";
+                
+                coins += 10;
+                document.getElementById('coinCount').innerText = coins;
+                
+                isRoundFinished = true;
+                document.getElementById('btnCheckout').style.display = 'none';
+                document.getElementById('btnClear').style.display = 'none';
+                document.getElementById('btnNext').style.display = 'block';
+
+                setTimeout(() => cartContainer.classList.remove('bounce'), 1000);
+            } else {
+                // ตอบผิด
+                playErrorSound();
+                cartContainer.classList.add('shake');
+                
+                if (!hasOnlyTargetProduct) {
+                    alert('หยิบของผิดชนิดมาด้วยนะ ลองเทของออกแล้วหยิบใหม่จ้า!');
+                } else if (cart[currentTask.product.id] > currentTask.targetCount) {
+                    alert('หยิบมาเยอะเกินไป ลองเทของออกแล้วหยิบใหม่นะ!');
+                } else {
+                    alert('ยังหยิบไม่ครบจ้า ลองหยิบเพิ่มอีกหน่อยนะ!');
+                }
+
+                setTimeout(() => cartContainer.classList.remove('shake'), 400);
+            }
+        }
+
+        // ไปรอบถัดไป
+        function nextRound() {
+            playPopSound();
+            isRoundFinished = false;
+            cart = {};
+            totalItemsInCart = 0;
+            updateCartUI();
+            
+            document.getElementById('btnCheckout').style.display = 'block';
+            document.getElementById('btnClear').style.display = 'block';
+            document.getElementById('btnNext').style.display = 'none';
+            document.getElementById('taskBoard').style.color = "#D84315";
+            
+            generateTask();
+        }
+
+        // เริ่มเกมครั้งแรก
+        window.onload = () => {
+            renderShelf();
+            generateTask();
+            updateCartUI();
+            
+            // ป้องกันปัญหา Audio Context ไม่เริ่มในบางเบราว์เซอร์
+            document.body.addEventListener('click', initAudio, { once: true });
+        };
+    </script>
+</body>
+</html>
