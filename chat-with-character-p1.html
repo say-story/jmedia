@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คุยกับตัวละครในนิทาน! - สื่อการสอนภาษาไทย ป.1</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700;800&display=swap');
+
+        :root {
+            --bg-start: #e9d5ff; /* Purple 200 */
+            --bg-end: #bae6fd; /* Blue 200 */
+            --text-main: #1e293b;
+            --text-light: #475569;
+            --primary: #8b5cf6;
+            --primary-dark: #6d28d9;
+            --secondary: #0ea5e9;
+            --bubble-user: #dcfce7; /* Green 100 */
+            --bubble-char: #ffffff;
+            --font-size-base: 22px;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 10px 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .title-container h1 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            line-height: 1.2;
+        }
+
+        .indicator-badge {
+            margin: 2px 0 0 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #4338ca;
+            background-color: #e0e7ff;
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            border: 1px solid #c7d2fe;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            background: #f3e8ff;
+            padding: 6px 16px;
+            border-radius: 30px;
+            border: 2px solid #e9d5ff;
+            display: none; /* Show only in chat */
+        }
+
+        /* Main Content Container */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            max-height: 100%;
+            flex-direction: column;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 1. Story Screen */
+        .story-container {
+            background: white;
+            border-radius: 24px;
+            padding: 30px 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            text-align: left;
+            border: 4px solid #fff;
+            flex: 1;
+        }
+
+        .story-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .story-content {
+            font-size: var(--font-size-base);
+            line-height: 1.9;
+            color: var(--text-main);
+            text-indent: 40px;
+            text-align: justify;
+        }
+        
+        .story-content p {
+            margin-bottom: 15px;
+        }
+
+        /* 2. Character Select Screen */
+        .select-title {
+            font-size: 32px;
+            font-weight: 800;
+            text-align: center;
+            color: var(--primary-dark);
+            margin-bottom: 25px;
+            text-shadow: 0 2px 4px rgba(255,255,255,0.5);
+        }
+
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .char-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            border: 3px solid transparent;
+        }
+
+        .char-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(139, 92, 246, 0.2);
+            border-color: var(--primary);
+        }
+
+        .char-emoji {
+            font-size: 70px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .char-name {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin: 0 0 10px 0;
+        }
+
+        .char-desc {
+            font-size: 18px;
+            color: var(--text-light);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* 3. Chat Screen */
+        .chat-layout {
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 24px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scroll-behavior: smooth;
+        }
+
+        .bubble {
+            max-width: 80%;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: var(--font-size-base);
+            line-height: 1.5;
+            animation: popBubble 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+            transform: scale(0.8);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        @keyframes popBubble {
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .bubble.char {
+            background-color: var(--bubble-char);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .bubble.user {
+            background-color: var(--bubble-user);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            border: 1px solid #bbf7d0;
+            color: #065f46;
+        }
+
+        .chat-input-area {
+            background: white;
+            padding: 15px 20px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #e2e8f0;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 30px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+        }
+
+        .btn-send {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-send:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* Buttons Setup */
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            background: linear-gradient(180deg, #a78bfa 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 22px;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--text-light);
+            border: 2px solid #cbd5e1;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            color: var(--text-main);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+            flex-shrink: 0;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                padding: 10px;
+                gap: 10px;
+            }
+            .header-left { flex-direction: column; gap: 5px; text-align: center;}
+            .story-container { padding: 20px; }
+            .btn-container { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+            .header-right { margin-top: 5px; }
+            main { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="https://img1.pic.in.th/images/sayremove1.png" alt="Logo" class="logo">
+            <div class="title-container">
+                <h1>คุยกับตัวละครในนิทาน!</h1>
+                <div class="indicator-badge">ตัวชี้วัด ท ๑.๑ ป.๑/๓</div>
+            </div>
+        </div>
+        <div class="header-right" id="chat-header-info">
+            <span id="header-char-emoji">🐰</span>
+            <span id="header-char-name">ฟูฟู</span>
+        </div>
+    </header>
+
+    <main>
+        
+        <div id="story-screen" class="screen active">
+            <div class="story-container">
+                <h2 class="story-title">นิทานเรื่อง กระต่ายน้อยกับป่าวิเศษ 🌲✨</h2>
+                <div class="story-content">
+                    <p>กาลครั้งหนึ่งใน <b>ป่าวิเศษ</b> อันแสนกว้างใหญ่ มีกระต่ายน้อยตัวหนึ่งชื่อว่า <b>ฟูฟู 🐰</b> ฟูฟูเป็นกระต่ายที่ใจดีแต่มักจะขี้กลัวอยู่เสมอ ฟูฟูอาศัยอยู่ในโพรงดินใต้ต้นไม้ใหญ่กับเพื่อนรักชื่อ <b>นัดดี 🐿️</b> ซึ่งเป็นกระรอกจอมซน</p>
+                    <p>วันหนึ่ง ฟูฟูและนัดดีออกไปหาอาหารด้วยกัน นัดดีกระโดดไปตามกิ่งไม้อย่างรวดเร็วเพื่อเก็บผลไม้ ส่วนฟูฟูเดินหาแครอทอยู่ที่พื้นดิน ฟูฟูเดินตามผีเสื้อสีสวยไปเรื่อยๆ จนรู้ตัวอีกทีก็ <b>หลงทางเสียแล้ว</b> ฟูฟูมองไม่เห็นนัดดีและหาทางกลับบ้านไม่เจอ ฟูฟูรู้สึกกลัวมากจนนั่งร้องไห้อยู่ใต้ต้นไม้ 😢</p>
+                    <p>โชคดีที่ <b>คุณลุงฮูฮู 🦉</b> นกฮูกผู้รอบรู้ที่อาศัยอยู่บนกิ่งไม้สูง มองลงมาเห็นฟูฟูพอดี คุณลุงฮูฮูจึงบินลงมาถามและช่วยบอกทางกลับบ้านให้ ฟูฟูเช็ดน้ำตาและเดินตามคำแนะนำจนกลับถึงโพรงดินอย่างปลอดภัย นัดดีดีใจมากที่เพื่อนกลับมา</p>
+                    <p>เหตุการณ์ครั้งนี้ทำให้ฟูฟูได้เรียนรู้ว่า <b>"เมื่อเรามีปัญหา การเอ่ยปากขอความช่วยเหลือจากผู้อื่นไม่ใช่เรื่องน่าอายเลย"</b> และป่าวิเศษแห่งนี้ก็ยังมีเพื่อนใจดีอีกมากมาย 💖</p>
+                </div>
+            </div>
+            <div class="btn-container">
+                <button class="btn" onclick="showScreen('select-screen')">อ่านจบแล้ว คุยกับตัวละครเลย! 💬</button>
+            </div>
+        </div>
+
+        <div id="select-screen" class="screen">
+            <h2 class="select-title">หนูอยากคุยกับใครจ๊ะ? 🤔</h2>
+            <div class="character-grid">
+                
+                <div class="char-card" onclick="startChat('fufu')">
+                    <div class="char-emoji">🐰</div>
+                    <h3 class="char-name">ฟูฟู</h3>
+                    <p class="char-desc">กระต่ายน้อยขี้กลัวแต่ใจดี ผู้หลงทางในป่าวิเศษ</p>
+                </div>
+
+                <div class="char-card" onclick="startChat('huhu')">
+                    <div class="char-emoji">🦉</div>
+                    <h3 class="char-name">ฮูฮู</h3>
+                    <p class="char-desc">นกฮูกผู้รอบรู้ ใจดี ชอบช่วยเหลือเด็กๆ</p>
+                </div>
+
+                <div class="char-card" onclick="startChat('nutty')">
+                    <div class="char-emoji">🐿️</div>
+                    <h3 class="char-name">นัดดี</h3>
+                    <p class="char-desc">กระรอกน้อยจอมซน เพื่อนรักเพื่อนซี้ของฟูฟู</p>
+                </div>
+
+            </div>
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="showScreen('story-screen')">📖 กลับไปอ่านนิทานอีกครั้ง</button>
+            </div>
+        </div>
+
+        <div id="chat-screen" class="screen">
+            <div class="chat-layout">
+                <div class="chat-messages" id="chat-messages">
+                    </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" class="chat-input" placeholder="พิมพ์ถามตัวละครที่นี่เลยจ้า..." autocomplete="off" onkeypress="handleKeyPress(event)">
+                    <button class="btn-send" onclick="sendMessage()">➤</button>
+                </div>
+            </div>
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="showScreen('select-screen')">👥 เปลี่ยนตัวละคร</button>
+                <button class="btn btn-secondary" onclick="showScreen('story-screen')">📖 อ่านนิทาน</button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        Designed & Developed by Mansay.h © 2026
+    </footer>
+
+    <script>
+        // Data สำหรับตัวละครและคำตอบ (Offline)
+        const charData = {
+            'fufu': {
+                name: 'ฟูฟู',
+                emoji: '🐰',
+                greeting: 'สวัสดีฮะ! ฟูฟูเองฮะ หนูมีอะไรอยากถามฟูฟูไหมฮะ? 🐰',
+                fallback: 'งืมๆ ฟูฟูไม่แน่ใจเรื่องนั้นเลยฮะ ลองถามเรื่องอื่นดูนะฮะ 🐰',
+                qa: [
+                    { keywords: ['ชื่อ', 'ใคร', 'ตัวอะไร'], answer: 'เราชื่อฟูฟูฮะ เป็นกระต่ายน้อยตัวนุ่มนิ่ม 🐰' },
+                    { keywords: ['บ้าน', 'อยู่ไหน', 'ที่อยู่'], answer: 'บ้านของฟูฟูอยู่ในโพรงดินใต้ต้นไม้ใหญ่ในป่าวิเศษฮะ 🌳' },
+                    { keywords: ['รู้สึก', 'กลัว', 'ร้องไห้', 'เสียใจ'], answer: 'ตอนหลงทางฟูฟูกลัวมากเลยฮะ ร้องไห้ด้วย แต่ตอนนี้ปลอดภัยแล้ว ไม่กลัวแล้วฮะ 😢' },
+                    { keywords: ['ทำอะไร', 'เกิดอะไร', 'ไปไหน'], answer: 'ฟูฟูออกไปหาอาหารแล้วก็เดินตามผีเสื้อจนหลงทางฮะ หาทางกลับไม่เจอเลย 🥕' },
+                    { keywords: ['เพื่อน', 'นัดดี', 'ซน'], answer: 'ฟูฟูมีเพื่อนรักชื่อนัดดีฮะ เขาเป็นกระรอกที่ซนมากๆ เลย ชอบกระโดดไปมา 🐿️' },
+                    { keywords: ['ฮูฮู', 'นกฮูก', 'ลุง', 'ช่วย'], answer: 'คุณลุงฮูฮูใจดีมากฮะ บินลงมาช่วยบอกทางให้ฟูฟูกลับบ้านได้ปลอดภัย 🦉' },
+                    { keywords: ['เรียนรู้', 'บทเรียน', 'ได้อะไร', 'สอน'], answer: 'ฟูฟูได้รู้ว่า ถ้าเรามีปัญหา การขอความช่วยเหลือจากผู้ใหญ่ไม่ใช่เรื่องน่าอายเลยฮะ ✨' },
+                    { keywords: ['กิน', 'อาหาร', 'ชอบ'], answer: 'ฟูฟูชอบกินแครอทและผักกาดขาวที่สุดเลยฮะ กร้วมๆ อร่อยมาก 🥕' },
+                    { keywords: ['หลงทาง', 'ปัญหา'], answer: 'ป่าวิเศษกว้างมากฮะ ฟูฟูเดินตามผีเสื้อเพลินไปหน่อยเลยหลงทางฮะ คราวหลังจะไม่ทำแล้ว 🦋' },
+                    { keywords: ['อายุ', 'กี่ขวบ', 'ป.1'], answer: 'ฟูฟูอายุ 7 ขวบฮะ เท่าๆ กับเพื่อนๆ ป.1 เลยฮะ ยินดีที่ได้รู้จักนะฮะ 🐰' }
+                ]
+            },
+            'huhu': {
+                name: 'ฮูฮู',
+                emoji: '🦉',
+                greeting: 'โฮ่วๆ สวัสดีจ้ะเด็กน้อย ลุงฮูฮูอยู่นี่แล้ว มีอะไรให้ลุงช่วยไหม? 🦉',
+                fallback: 'โฮ่วๆ ลุงไม่ค่อยเข้าใจคำถามของหนูเลย ลองถามเรื่องอื่นดูสิ โฮ่วๆ 🦉',
+                qa: [
+                    { keywords: ['ชื่อ', 'ใคร', 'ตัวอะไร'], answer: 'ลุงชื่อฮูฮู เป็นนกฮูกผู้รอบรู้ประจำป่าวิเศษแห่งนี้ โฮ่วๆ 🦉' },
+                    { keywords: ['บ้าน', 'อยู่ไหน', 'ที่อยู่'], answer: 'บ้านของลุงอยู่บนกิ่งไม้สูงสุดของต้นไทรยักษ์ มองเห็นได้ทั่วทั้งป่าเลยล่ะ 🌳' },
+                    { keywords: ['รู้สึก', 'ดีใจ', 'เป็นไง'], answer: 'ลุงดีใจมากที่ได้ช่วยเด็กๆ อย่างฟูฟูให้ปลอดภัยกลับบ้านได้ โฮ่วๆ 😊' },
+                    { keywords: ['ทำอะไร', 'เกิดอะไร', 'ช่วย'], answer: 'ลุงกำลังบินตรวจตราป่า แล้วเห็นฟูฟูร้องไห้ เลยบินลงไปช่วยบอกทางกลับบ้านให้ 🦉' },
+                    { keywords: ['เพื่อน', 'รู้จัก'], answer: 'ลุงรู้จักสัตว์ทุกตัวในป่าวิเศษ ทั้งฟูฟูและนัดดีก็เป็นเด็กดีนะ โฮ่วๆ 🌲' },
+                    { keywords: ['ฟูฟู', 'กระต่าย'], answer: 'ฟูฟูเป็นกระต่ายที่ขี้กลัวนิดหน่อย แต่ก็เก่งมากที่กล้าเอ่ยปากถามทางลุง 🐰' },
+                    { keywords: ['นัดดี', 'กระรอก'], answer: 'เจ้านัดดีน่ะซนจริงๆ ชอบกระโดดไปมา แต่ก็เป็นเพื่อนที่รักฟูฟูมากนะ 🐿️' },
+                    { keywords: ['เรียนรู้', 'บทเรียน', 'สอน'], answer: 'ลุงอยากสอนว่า ผู้ใหญ่ใจดีพร้อมช่วยเหลือเด็กๆ เสมอ แค่กล้าเอ่ยปากถามนะ โฮ่วๆ ✨' },
+                    { keywords: ['กิน', 'อาหาร', 'ชอบ'], answer: 'ลุงชอบกินแมลงและผลไม้ป่าตอนกลางคืน โฮ่วๆ อร่อยดีนะ 🍎' },
+                    { keywords: ['อายุ', 'แก่'], answer: 'ลุงอายุเยอะมากๆ แล้วล่ะ อยู่ดูแลในป่าวิเศษแห่งนี้มานานแสนนานเลย โฮ่วๆ 🦉' }
+                ]
+            },
+            'nutty': {
+                name: 'นัดดี',
+                emoji: '🐿️',
+                greeting: 'จิ๊ดๆ! สวัสดีจ้า นัดดีเอง! อยากคุยเรื่องอะไร ถามมาได้เลย ปรู๊ดปร๊าด! 🐿️',
+                fallback: 'จิ๊ดๆ นัดดีงงจังเลย ถามเรื่องอื่นได้ไหมจ๊ะ นัดดีอยากคุยต่อๆ 🐿️',
+                qa: [
+                    { keywords: ['ชื่อ', 'ใคร', 'ตัวอะไร'], answer: 'เราชื่อนัดดีจ้า เป็นกระรอกน้อยจอมพลัง วิ่งเร็วปรู๊ดปร๊าด! 🐿️' },
+                    { keywords: ['บ้าน', 'อยู่ไหน', 'ที่อยู่'], answer: 'บ้านเราอยู่ในโพรงไม้สูงๆ ใกล้ๆ กับบ้านโพรงดินของฟูฟูเลยจ้า 🌳' },
+                    { keywords: ['รู้สึก', 'สนุก', 'ตกใจ'], answer: 'ตอนฟูฟูหายไป นัดดีตกใจมาก! วิ่งหาวุ่นเลย โชคดีที่ฟูฟูกลับมาได้ 😅' },
+                    { keywords: ['ทำอะไร', 'เกิดอะไร', 'ไปไหน'], answer: 'เราไปเก็บผลไม้ป่ากับฟูฟูจ้า แต่เผลอวิ่งนำหน้าไปหน่อย ฟูฟูเลยหลงเลย 🍓' },
+                    { keywords: ['เพื่อน', 'ฟูฟู'], answer: 'ฟูฟูเป็นเพื่อนรักเพื่อนซี้ของนัดดีเลยนะ ตัวนุ่มนิ่มน่ากอดที่สุด! 🐰' },
+                    { keywords: ['ฮูฮู', 'นกฮูก', 'ลุง'], answer: 'คุณลุงฮูฮูเก่งและตาดีมาก มองเห็นจากที่สูงเลยช่วยหาฟูฟูจนเจอจ้า 🦉' },
+                    { keywords: ['เรียนรู้', 'บทเรียน', 'ได้อะไร'], answer: 'นัดดีได้เรียนรู้ว่า ไม่ควรวิ่งเล่นไกลๆ ทิ้งเพื่อนไว้คนเดียวอีกแล้ว ขอโทษนะฟูฟู 🙏' },
+                    { keywords: ['กิน', 'อาหาร', 'ชอบ', 'ผลไม้'], answer: 'นัดดีชอบกินลูกโอ๊ก ลูกนัท และเบอร์รี่หวานๆ ในป่าที่สุดเลย จิ๊ดๆ 🌰' },
+                    { keywords: ['หลงทาง', 'ปัญหา'], answer: 'นัดดีไม่ได้หลงนะ แต่ฟูฟูหลงจ้า ต่อไปนี้นัดดีจะจับมือฟูฟูไว้แน่นๆ เลย 🤝' },
+                    { keywords: ['อายุ', 'กี่ขวบ', 'ป.1'], answer: 'นัดดีก็ 7 ขวบเหมือนกันจ้า กำลังซนและพลังเยอะเลยใช่ไหมล่ะ จิ๊ดๆ 🐿️' }
+                ]
+            }
+        };
+
+        let currentChar = null;
+
+        // Web Audio API สำหรับสร้างเสียงเอฟเฟกต์ (Offline)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            try {
+                initAudio();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                if (type === 'send') {
+                    // เสียงดึ๋งตอนส่ง
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.1);
+                } else if (type === 'receive') {
+                    // เสียงป๊อปตอนรับ
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.15);
+                    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.15);
+                }
+            } catch (e) {
+                console.log("Audio not supported or blocked.");
+            }
+        }
+
+        // การจัดการหน้าจอ
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            // จัดการแสดงผล Header
+            const headerInfo = document.getElementById('chat-header-info');
+            if (screenId === 'chat-screen') {
+                headerInfo.style.display = 'flex';
+            } else {
+                headerInfo.style.display = 'none';
+            }
+        }
+
+        // เริ่มต้นแชทกับตัวละคร
+        function startChat(charId) {
+            currentChar = charId;
+            const data = charData[charId];
+            
+            // อัปเดต Header
+            document.getElementById('header-char-emoji').innerText = data.emoji;
+            document.getElementById('header-char-name').innerText = data.name;
+
+            // เคลียร์แชทเก่า และใส่คำทักทาย
+            const chatBox = document.getElementById('chat-messages');
+            chatBox.innerHTML = '';
+            
+            showScreen('chat-screen');
+            initAudio(); // ขอสิทธิ์ใช้งานเสียงตอนคลิกเปลี่ยนหน้า
+            
+            // ดีเลย์คำทักทายนิดหน่อยให้ดูเป็นธรรมชาติ
+            setTimeout(() => {
+                appendBubble(data.emoji + ' ' + data.greeting, 'char');
+                playSound('receive');
+            }, 400);
+        }
+
+        // ตรวจจับการกดปุ่ม Enter
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // ส่งข้อความ
+        function sendMessage() {
+            const inputField = document.getElementById('chat-input');
+            const text = inputField.value.trim();
+            
+            if (text === '') return;
+
+            // พิมพ์ของ User
+            appendBubble(text, 'user');
+            playSound('send');
+            inputField.value = '';
+
+            // จำลองการคิดของตัวละคร แล้วตอบกลับ
+            setTimeout(() => {
+                const response = getCharacterResponse(text);
+                appendBubble(charData[currentChar].emoji + ' ' + response, 'char');
+                playSound('receive');
+            }, 600 + Math.random() * 400); // ดีเลย์ 0.6 - 1.0 วินาที
+        }
+
+        // หาคำตอบที่ตรงกับคีย์เวิร์ด
+        function getCharacterResponse(userInput) {
+            const data = charData[currentChar];
+            const textLower = userInput.toLowerCase(); // แปลงเป็นพิมพ์เล็ก (เผื่อมีอังกฤษ) แต่ภาษาไทยไม่มีผล
+
+            for (let item of data.qa) {
+                // เช็คว่าในข้อความที่พิมพ์ มีคีย์เวิร์ดอย่างน้อย 1 คำหรือไม่
+                for (let kw of item.keywords) {
+                    if (textLower.includes(kw)) {
+                        return item.answer;
+                    }
+                }
+            }
+            
+            // ถ้าไม่เจอคีย์เวิร์ดเลย
+            return data.fallback;
+        }
+
+        // เพิ่มบับเบิลข้อความลงในแชท
+        function appendBubble(text, sender) {
+            const chatBox = document.getElementById('chat-messages');
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble', sender);
+            bubble.innerText = text;
+            chatBox.appendChild(bubble);
+            
+            // เลื่อนจอลงไปล่างสุดเสมอ
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+    </script>
+</body>
+</html>
