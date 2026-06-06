@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="th" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>นับลูกบอลกันเถอะ!</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Sarabun', sans-serif; }
+    .ball {
+      border-radius: 50%;
+      position: absolute;
+      box-shadow: inset -8px -8px 20px rgba(0,0,0,0.2), inset 4px 4px 10px rgba(255,255,255,0.4), 4px 6px 12px rgba(0,0,0,0.2);
+    }
+    .ball::after {
+      content: '';
+      position: absolute;
+      top: 15%;
+      left: 25%;
+      width: 30%;
+      height: 20%;
+      background: rgba(255,255,255,0.5);
+      border-radius: 50%;
+      transform: rotate(-30deg);
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes celebrate {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2) rotate(5deg); }
+      100% { transform: scale(1); }
+    }
+    .celebrate { animation: celebrate 0.5s ease; }
+    .ball-animate { animation: bounce 1.5s ease-in-out infinite; }
+    .btn-press:active { transform: scale(0.92); }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ <script src="/_sdk/telemetry_sdk.js"></script></head>
+ <body class="h-full">
+  <div id="app" class="h-full w-full overflow-auto" style="background: linear-gradient(135deg, #e0f7fa 0%, #fff9c4 50%, #f8bbd0 100%);">
+   <!-- Score -->
+   <div class="absolute top-4 right-4 bg-white/80 rounded-2xl px-5 py-3 shadow-lg z-10">
+    <span class="text-lg font-bold text-purple-600">⭐ คะแนน: <span id="score">0</span></span>
+   </div>
+   <div class="flex flex-col items-center px-4 py-6 min-h-full">
+    <!-- Logo and Title --> <img src="https://img1.pic.in.th/images/sayremove1.png" alt="Logo" class="w-20 h-20 md:w-28 md:h-28 mb-3 drop-shadow-lg" loading="lazy" onerror="console.error('Logo failed to load:', this.src); this.style.display='none';">
+    <h1 id="title" class="text-3xl md:text-4xl font-extrabold text-purple-700 mb-2 text-center">🎈 นับลูกบอลกันเถอะ! 🎈</h1>
+    <p class="text-xl text-orange-600 font-bold mb-4">🧮 ลูกบอลมีกี่ลูกนะ?</p><!-- Ball Area -->
+    <div id="ball-area" class="relative w-full max-w-lg h-64 md:h-80 bg-white/50 rounded-3xl border-4 border-dashed border-yellow-400 mb-6 overflow-hidden"></div><!-- Answer Section -->
+    <div id="result-msg" class="text-2xl font-bold mb-3 min-h-[2.5rem] text-center"></div>
+    <div class="flex flex-wrap justify-center gap-2 mb-4 max-w-md">
+     <input id="answer-input" type="number" min="1" max="20" placeholder="พิมพ์ตัวเลข..." class="w-32 text-center text-2xl font-bold rounded-xl border-4 border-purple-300 focus:border-purple-500 outline-none py-3 bg-white">
+    </div><!-- Number Buttons -->
+    <div class="grid grid-cols-5 gap-2 mb-4 max-w-sm">
+    </div>
+    <div id="num-buttons" class="flex flex-wrap justify-center gap-2 mb-5 max-w-md"></div><!-- Action Buttons -->
+    <div class="flex gap-4 flex-wrap justify-center mb-6">
+     <button id="check-btn" onclick="checkAnswer()" class="btn-press bg-green-500 hover:bg-green-600 text-white text-xl font-bold px-8 py-4 rounded-2xl shadow-lg transition">✅ ตรวจคำตอบ</button> <button id="new-btn" onclick="newRound()" class="btn-press bg-orange-400 hover:bg-orange-500 text-white text-xl font-bold px-8 py-4 rounded-2xl shadow-lg transition">🔄 ลองใหม่</button>
+    </div><!-- Thai Number Display -->
+    <div id="thai-num" class="text-2xl font-bold text-center text-indigo-700 min-h-[2rem] mb-4"></div>
+    <div class="mt-auto pt-4">
+     <p id="footer" class="text-sm text-gray-500 text-center">Designed &amp; Developed by Mansay.h © 2026</p>
+    </div>
+   </div>
+  </div>
+  <script>
+  const thaiNums = ['๐','๑','๒','๓','๔','๕','๖','๗','๘','๙','๑๐','๑๑','๑๒','๑๓','๑๔','๑๕','๑๖','๑๗','๑๘','๑๙','๒๐'];
+  const ballColors = ['#ef4444','#f59e0b','#22c55e','#3b82f6','#f97316','#a855f7','#ec4899','#14b8a6','#6366f1','#84cc16'];
+  let correctAnswer = 0;
+  let score = 0;
+  let audioCtx;
+
+  function getAudioCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  function playSound(success) {
+    try {
+      const ctx = getAudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      if (success) {
+        osc.frequency.setValueAtTime(523, ctx.currentTime);
+        osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(784, ctx.currentTime + 0.2);
+      } else {
+        osc.frequency.setValueAtTime(300, ctx.currentTime);
+        osc.frequency.setValueAtTime(200, ctx.currentTime + 0.15);
+      }
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.4);
+    } catch(e) {}
+  }
+
+  function generateBalls() {
+    const area = document.getElementById('ball-area');
+    area.innerHTML = '';
+    correctAnswer = Math.floor(Math.random() * 20) + 1;
+    const areaW = area.clientWidth;
+    const areaH = area.clientHeight;
+    const size = Math.max(30, Math.min(55, Math.floor(Math.min(areaW, areaH) / (Math.sqrt(correctAnswer) * 1.8))));
+
+    for (let i = 0; i < correctAnswer; i++) {
+      const ball = document.createElement('div');
+      ball.className = 'ball ball-animate';
+      const color = ballColors[i % ballColors.length];
+      ball.style.width = size + 'px';
+      ball.style.height = size + 'px';
+      ball.style.background = `radial-gradient(circle at 35% 35%, ${color}dd, ${color})`;
+      ball.style.left = Math.random() * (areaW - size - 10) + 5 + 'px';
+      ball.style.top = Math.random() * (areaH - size - 10) + 5 + 'px';
+      ball.style.animationDelay = (Math.random() * 1.5) + 's';
+      area.appendChild(ball);
+    }
+  }
+
+  function checkAnswer() {
+    const input = document.getElementById('answer-input');
+    const val = parseInt(input.value);
+    const msg = document.getElementById('result-msg');
+    const thaiNum = document.getElementById('thai-num');
+
+    if (isNaN(val)) {
+      msg.innerHTML = '🤔 ใส่ตัวเลขก่อนนะ!';
+      msg.className = 'text-2xl font-bold mb-3 min-h-[2.5rem] text-center text-yellow-600';
+      return;
+    }
+
+    if (val === correctAnswer) {
+      score++;
+      document.getElementById('score').textContent = score;
+      msg.innerHTML = '🎉 ถูกต้อง! เก่งมาก! 🌟';
+      msg.className = 'text-2xl font-bold mb-3 min-h-[2.5rem] text-center text-green-600 celebrate';
+      thaiNum.innerHTML = `✨ ${correctAnswer} = ${thaiNums[correctAnswer]} ✨`;
+      playSound(true);
+    } else {
+      msg.innerHTML = `😢 ยังไม่ถูกนะ ลองนับใหม่อีกครั้ง!`;
+      msg.className = 'text-2xl font-bold mb-3 min-h-[2.5rem] text-center text-red-500';
+      thaiNum.innerHTML = '';
+      playSound(false);
+    }
+  }
+
+  function newRound() {
+    document.getElementById('answer-input').value = '';
+    document.getElementById('result-msg').innerHTML = '';
+    document.getElementById('thai-num').innerHTML = '';
+    generateBalls();
+  }
+
+  // Number buttons
+  function createNumButtons() {
+    const container = document.getElementById('num-buttons');
+    for (let i = 1; i <= 20; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'btn-press w-12 h-12 md:w-14 md:h-14 rounded-xl bg-indigo-400 hover:bg-indigo-500 text-white text-xl font-bold shadow transition';
+      btn.textContent = i;
+      btn.onclick = () => { document.getElementById('answer-input').value = i; };
+      container.appendChild(btn);
+    }
+  }
+
+  // Init
+  createNumButtons();
+  generateBalls();
+
+  // Element SDK
+  const defaultConfig = {
+    game_title: 'นับลูกบอลกันเถอะ!',
+    footer_text: 'Designed & Developed by Mansay.h © 2026',
+    background_color: '#e0f7fa',
+    text_color: '#7c3aed',
+    primary_action: '#22c55e',
+    secondary_action: '#fb923c',
+    surface_color: '#ffffff'
+  };
+
+  function applyConfig(config) {
+    const c = { ...defaultConfig, ...config };
+    document.getElementById('title').textContent = '🎈 ' + c.game_title + ' 🎈';
+    document.getElementById('footer').textContent = c.footer_text;
+    document.getElementById('app').style.background = `linear-gradient(135deg, ${c.background_color} 0%, #fff9c4 50%, #f8bbd0 100%)`;
+    document.getElementById('title').style.color = c.text_color;
+    document.getElementById('check-btn').style.backgroundColor = c.primary_action;
+    document.getElementById('new-btn').style.backgroundColor = c.secondary_action;
+  }
+
+  if (window.elementSdk) {
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange: async (config) => { applyConfig(config); },
+      mapToCapabilities: (config) => ({
+        recolorables: [
+          { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+          { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+          { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+          { get: () => config.primary_action || defaultConfig.primary_action, set: (v) => { config.primary_action = v; window.elementSdk.setConfig({ primary_action: v }); } },
+          { get: () => config.secondary_action || defaultConfig.secondary_action, set: (v) => { config.secondary_action = v; window.elementSdk.setConfig({ secondary_action: v }); } }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || 'Sarabun',
+          set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); }
+        },
+        fontSizeable: {
+          get: () => config.font_size || 18,
+          set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); }
+        }
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ['game_title', config.game_title || defaultConfig.game_title],
+        ['footer_text', config.footer_text || defaultConfig.footer_text]
+      ])
+    });
+  }
+
+  lucide.createIcons();
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a074263969bfce85',t:'MTc4MDcxNDY0Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
