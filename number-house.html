@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บ้านตัวเลข 1-100</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sky-bg: #87CEEB;
+            --text-dark: #2C3E50;
+            --btn-blue: #3498DB;
+            --btn-green: #2ECC71;
+            --btn-purple: #9B59B6;
+            --btn-orange: #E67E22;
+            --btn-red: #E74C3C;
+            --font-main: 'Sarabun', sans-serif;
+        }
+
+        /* 10 สีหลังคา สำหรับ 10 แถว */
+        .color-0 { --roof-color: #FF5252; } /* 1-10 */
+        .color-1 { --roof-color: #FF9800; } /* 11-20 */
+        .color-2 { --roof-color: #FFC107; } /* 21-30 */
+        .color-3 { --roof-color: #4CAF50; } /* 31-40 */
+        .color-4 { --roof-color: #00BCD4; } /* 41-50 */
+        .color-5 { --roof-color: #2196F3; } /* 51-60 */
+        .color-6 { --roof-color: #9C27B0; } /* 61-70 */
+        .color-7 { --roof-color: #E91E63; } /* 71-80 */
+        .color-8 { --roof-color: #795548; } /* 81-90 */
+        .color-9 { --roof-color: #009688; } /* 91-100 */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ของตกแต่งฉากหลัง */
+        .clouds {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background-image: 
+                radial-gradient(circle at 10% 20%, white 0%, transparent 5%),
+                radial-gradient(circle at 80% 15%, white 0%, transparent 6%),
+                radial-gradient(circle at 40% 10%, white 0%, transparent 4%);
+            opacity: 0.8;
+        }
+
+        /* Header & Controls */
+        header {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-left h1 {
+            font-size: 2rem;
+            color: #2980B9;
+            text-shadow: 1px 1px 0px white;
+        }
+
+        .scoreboard {
+            font-size: 1.6rem;
+            font-weight: bold;
+            background: #FFF3E0;
+            padding: 5px 20px;
+            border-radius: 20px;
+            border: 2px solid #FF9800;
+            display: none; /* แสดงเฉพาะโหมด 2 */
+        }
+        .stars { color: #FFC107; }
+
+        /* Navigation Buttons */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255,255,255,0.5);
+        }
+
+        .btn {
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            font-family: inherit;
+            border-radius: 12px;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+            transition: all 0.1s;
+        }
+        .btn:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
+        
+        .btn-mode-1 { background-color: var(--btn-blue); }
+        .btn-mode-2 { background-color: var(--btn-green); }
+        .btn-mode-3 { background-color: var(--btn-purple); }
+        .btn-reset { background-color: var(--btn-red); }
+        .btn-read { background-color: var(--btn-orange); }
+
+        .btn.active {
+            outline: 4px solid #F1C40F;
+            transform: scale(1.05);
+        }
+
+        /* Task Banner (โหมด 2) */
+        .task-banner {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #D35400;
+            margin: 10px 0;
+            display: none;
+            text-shadow: 2px 2px 0px white;
+        }
+
+        /* Grid Board */
+        main {
+            flex: 1;
+            padding: 10px 20px 30px;
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+        }
+
+        .village {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+            max-width: 1200px;
+            min-width: 800px; /* บังคับขนาดขั้นต่ำให้ไม่บี้แบน */
+        }
+
+        /* House Design */
+        .house {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .house:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .roof {
+            width: 100%;
+            height: 35px;
+            background-color: var(--roof-color);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            margin-bottom: -2px; /* ลบรอยต่อ */
+        }
+
+        .wall {
+            width: 85%;
+            background-color: #FFF;
+            border: 2px solid #BDC3C7;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 0 0 0;
+            position: relative;
+            box-shadow: inset 0 -10px 0px rgba(0,0,0,0.05);
+        }
+
+        .num-ar {
+            font-size: 1.8rem;
+            font-weight: bold;
+            line-height: 1;
+            color: #2C3E50;
+        }
+
+        .num-th {
+            font-size: 1.2rem;
+            color: #7F8C8D;
+            line-height: 1;
+            margin-top: 2px;
+        }
+
+        .door {
+            width: 20px;
+            height: 25px;
+            background-color: #8D6E63;
+            border-radius: 5px 5px 0 0;
+            margin-top: 5px;
+            border: 1px solid #5D4037;
+        }
+
+        /* Highlights & Animations */
+        .house.highlight .wall { background-color: #FFF9C4; border-color: #FBC02D; }
+        .house.highlight .num-ar { color: #E65100; transform: scale(1.2); }
+        
+        .house.correct .wall { background-color: #C8E6C9; border-color: #2E7D32; }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-5deg); }
+            75% { transform: translateX(5px) rotate(5deg); }
+        }
+        .house.wrong { animation: shake 0.4s; }
+        .house.wrong .wall { background-color: #FFCDD2; border-color: #C62828; }
+
+        /* Popup Modal (Mode 1) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            border: 8px solid #FF9800;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: scale(0.5);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-width: 300px;
+        }
+        .modal-overlay.open .modal-content { transform: scale(1); }
+
+        .modal-ar { font-size: 6rem; font-weight: bold; color: #E65100; line-height: 1; }
+        .modal-th { font-size: 4rem; color: #2980B9; margin: 10px 0; }
+        .modal-word { font-size: 3rem; color: #27AE60; font-weight: bold; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #BDC3C7;
+            color: #34495E;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .header-left h1 { font-size: 1.5rem; }
+            .btn { font-size: 1.2rem; padding: 8px 15px; }
+            .village { min-width: 600px; gap: 4px; }
+            .num-ar { font-size: 1.4rem; }
+            .roof { height: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="clouds"></div>
+
+    <header>
+        <div class="header-left">
+            <img src="https://img1.pic.in.th/images/sayremove1.png" style="height:36px;" alt="logo">
+            <h1>บ้านตัวเลข 1-100</h1>
+        </div>
+        <div class="scoreboard" id="scoreBoard">
+            คะแนน: <span id="scoreDisplay">0</span> <span class="stars">⭐ <span id="starDisplay">0</span></span>
+        </div>
+    </header>
+
+    <div class="controls">
+        <button class="btn btn-mode-1 active" id="btnM1" onclick="setMode(1)">🔍 สำรวจบ้าน</button>
+        <button class="btn btn-mode-2" id="btnM2" onclick="setMode(2)">🎯 หาบ้านให้ถูก</button>
+        <button class="btn btn-mode-3" id="btnM3" onclick="setMode(3)">🌈 เรียงสีเดียวกัน</button>
+        <button class="btn btn-read" onclick="startAutoRead()">📢 อ่านทั้งหมด</button>
+        <button class="btn btn-reset" onclick="resetBoard()">🔄 รีเซ็ต</button>
+    </div>
+
+    <div class="task-banner" id="taskBanner">หาบ้านหมายเลข <span>--</span></div>
+
+    <main>
+        <div class="village" id="villageGrid">
+            </div>
+    </main>
+
+    <div class="modal-overlay" id="numModal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-ar" id="modAr">1</div>
+            <div class="modal-th" id="modTh">๑</div>
+            <div class="modal-word" id="modWord">หนึ่ง</div>
+        </div>
+    </div>
+
+    <footer>
+        Designed & Developed by Mansay.h © 2026
+    </footer>
+
+    <script>
+        // Data & State
+        const thaiDigits = ['๐','๑','๒','๓','๔','๕','๖','๗','๘','๙'];
+        const words = ['ศูนย์','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด','เก้า'];
+        
+        let currentMode = 1;
+        let score = 0;
+        let stars = 0;
+        let targetNumber = 0;
+        let autoReadTimeout = null;
+        let isAutoReading = false;
+
+        // ฟังก์ชันแปลงเลขอารบิกเป็นคำอ่านภาษาไทย
+        function numToThaiWord(n) {
+            if (n === 100) return 'หนึ่งร้อย';
+            if (n < 10) return words[n];
+            let tens = Math.floor(n / 10);
+            let units = n % 10;
+            let str = '';
+            
+            if (tens === 1) str += 'สิบ';
+            else if (tens === 2) str += 'ยี่สิบ';
+            else if (tens > 2) str += words[tens] + 'สิบ';
+            
+            if (units === 1) str += 'เอ็ด';
+            else if (units > 1) str += words[units];
+            
+            return str;
+        }
+
+        function numToThaiDigit(n) {
+            return n.toString().split('').map(d => thaiDigits[d]).join('');
+        }
+
+        // Web Speech API สำหรับอ่านออกเสียง
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // หยุดเสียงเก่า
+                let utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'th-TH';
+                utterance.rate = 0.85; // อ่านช้าลงเล็กน้อยให้เด็กฟังชัด
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // ระบบเสียง Effect พื้นฐาน (สำหรับตอบถูก/ผิด)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTone(freq, type, duration) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playCorrect() { playTone(600, 'sine', 0.1); setTimeout(() => playTone(800, 'sine', 0.2), 100); }
+        function playWrong() { playTone(200, 'sawtooth', 0.3); }
+
+        // สร้างตารางบ้าน
+        function initGrid() {
+            const grid = document.getElementById('villageGrid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 100; i++) {
+                const rowColorIndex = Math.floor((i - 1) / 10); // สีแถวละ 10
+                
+                const house = document.createElement('div');
+                house.className = `house color-${rowColorIndex}`;
+                house.id = `house-${i}`;
+                house.onclick = () => handleHouseClick(i);
+
+                house.innerHTML = `
+                    <div class="roof"></div>
+                    <div class="wall">
+                        <div class="num-ar">${i}</div>
+                        <div class="num-th">${numToThaiDigit(i)}</div>
+                        <div class="door"></div>
+                    </div>
+                `;
+                grid.appendChild(house);
+            }
+        }
+
+        // เปลี่ยนโหมด
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.controls .btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btnM' + mode).classList.add('active');
+            
+            stopAutoRead();
+            resetBoard();
+
+            const scoreBoard = document.getElementById('scoreBoard');
+            const taskBanner = document.getElementById('taskBanner');
+
+            if (mode === 2) {
+                scoreBoard.style.display = 'block';
+                taskBanner.style.display = 'block';
+                generateNewTarget();
+            } else {
+                scoreBoard.style.display = 'none';
+                taskBanner.style.display = 'none';
+            }
+        }
+
+        // รีเซ็ตการไฮไลต์
+        function resetBoard() {
+            document.querySelectorAll('.house').forEach(h => {
+                h.classList.remove('highlight', 'correct', 'wrong');
+            });
+            stopAutoRead();
+        }
+
+        // สร้างโจทย์ใหม่โหมด 2
+        function generateNewTarget() {
+            targetNumber = Math.floor(Math.random() * 100) + 1;
+            const targetWord = numToThaiWord(targetNumber);
+            const targetTh = numToThaiDigit(targetNumber);
+            document.getElementById('taskBanner').innerHTML = `หาบ้านหมายเลข <span style="font-size:3rem">${targetTh}</span> (${targetWord})`;
+            speakText('หาบ้านหมายเลข ' + targetWord);
+        }
+
+        // จัดการเมื่อคลิกบ้าน
+        function handleHouseClick(num) {
+            stopAutoRead(); // หยุดอ่านอัตโนมัติถ้าเด็กกดเล่นเอง
+            
+            const houseEl = document.getElementById(`house-${num}`);
+            const word = numToThaiWord(num);
+            const thNum = numToThaiDigit(num);
+
+            if (currentMode === 1) {
+                // โหมด 1: สำรวจ
+                resetBoard();
+                houseEl.classList.add('highlight');
+                showModal(num, thNum, word);
+                speakText(word);
+            } 
+            else if (currentMode === 2) {
+                // โหมด 2: หาบ้าน
+                if (num === targetNumber) {
+                    playCorrect();
+                    houseEl.classList.add('correct');
+                    speakText('ถูกต้องค่ะ ' + word);
+                    
+                    score += 10;
+                    if (score % 50 === 0) stars++;
+                    
+                    document.getElementById('scoreDisplay').innerText = score;
+                    document.getElementById('starDisplay').innerText = stars;
+                    
+                    setTimeout(() => {
+                        houseEl.classList.remove('correct');
+                        generateNewTarget();
+                    }, 1500);
+                } else {
+                    playWrong();
+                    houseEl.classList.add('wrong');
+                    speakText('ยังไม่ใช่ค่ะ ลองใหม่นะ');
+                    setTimeout(() => houseEl.classList.remove('wrong'), 500);
+                }
+            }
+            else if (currentMode === 3) {
+                // โหมด 3: เรียงสี
+                resetBoard();
+                const startRange = Math.floor((num - 1) / 10) * 10 + 1;
+                speakText(`แถวของเลข ${numToThaiWord(startRange)} ถึง ${numToThaiWord(startRange + 9)}`);
+                
+                for (let i = 0; i < 10; i++) {
+                    const h = document.getElementById(`house-${startRange + i}`);
+                    setTimeout(() => h.classList.add('highlight'), i * 100);
+                }
+            }
+        }
+
+        // Popup ควบคุม
+        function showModal(ar, th, word) {
+            document.getElementById('modAr').innerText = ar;
+            document.getElementById('modTh').innerText = th;
+            document.getElementById('modWord').innerText = word;
+            document.getElementById('numModal').classList.add('open');
+            
+            // Auto close after 3 seconds in Mode 1 to keep flow going
+            setTimeout(() => { closeModal(); }, 2500);
+        }
+
+        function closeModal() {
+            document.getElementById('numModal').classList.remove('open');
+        }
+
+        // ระบบอ่านอัตโนมัติ 1-100
+        function startAutoRead() {
+            setMode(1); // บังคับเป็นโหมด 1 
+            isAutoReading = true;
+            let currentReadNum = 1;
+
+            function readNext() {
+                if (!isAutoReading || currentReadNum > 100) {
+                    stopAutoRead();
+                    return;
+                }
+                
+                resetBoard();
+                const houseEl = document.getElementById(`house-${currentReadNum}`);
+                houseEl.classList.add('highlight');
+                
+                // เลื่อนหน้าจอให้เห็นบ้านที่กำลังอ่าน (Smooth Scroll)
+                houseEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                const word = numToThaiWord(currentReadNum);
+                speakText(word);
+
+                // ตั้งเวลาอ่านหลังถัดไป (ปรับจังหวะตามความเหมาะสม)
+                autoReadTimeout = setTimeout(() => {
+                    currentReadNum++;
+                    readNext();
+                }, 1500); 
+            }
+
+            readNext();
+        }
+
+        function stopAutoRead() {
+            isAutoReading = false;
+            clearTimeout(autoReadTimeout);
+            if('speechSynthesis' in window) window.speechSynthesis.cancel();
+        }
+
+        // เริ่มต้นการทำงาน
+        window.onload = () => {
+            initGrid();
+            // ปลดล็อก Audio API เมื่อมีการโต้ตอบครั้งแรก
+            document.body.addEventListener('click', () => {
+                if(audioCtx.state === 'suspended') audioCtx.resume();
+            }, { once: true });
+        };
+
+    </script>
+</body>
+</html>
