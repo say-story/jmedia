@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>คลังสื่อการสอนออนไลน์ | Teaching Media Hub</title>
-    <!-- เพิ่ม Google Fonts: Sarabun ตรงนี้ -->
+    <!-- Google Fonts: TH Sarabun -->
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* =========================================
@@ -40,7 +40,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            /* เปลี่ยน Font ให้เป็น Sarabun */
+            /* เปลี่ยนเป็น TH Sarabun และใช้ font-smoothing แบบ Apple */
             font-family: 'Sarabun', sans-serif;
         }
 
@@ -51,10 +51,9 @@
             min-height: 100vh;
             overflow-x: hidden;
             scroll-behavior: smooth;
-            /* ปรับความคมชัดของฟอนต์สไตล์ macOS (Retina) */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            text-rendering: optimizeLegibility;
+            font-size: 18px; /* ปรับขนาดให้ Sarabun อ่านง่ายขึ้น */
         }
 
         /* Custom Scrollbar */
@@ -109,13 +108,16 @@
         }
 
         .logo-text h1 {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-weight: 600;
+            margin: 0;
+            line-height: 1.2;
         }
 
         .logo-text p {
-            font-size: 0.8rem;
+            font-size: 1rem;
             color: var(--text-secondary);
+            margin: 0;
         }
 
         /* Buttons */
@@ -130,6 +132,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            font-size: 1.1rem;
         }
 
         .btn-primary {
@@ -172,7 +175,7 @@
         }
 
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             color: var(--text-secondary);
             margin-bottom: 40px;
             max-width: 600px;
@@ -210,7 +213,7 @@
 
         /* Search Section */
         .search-container {
-            max-width: 600px;
+            max-width: 800px;
             margin: -30px auto 50px;
             position: relative;
             z-index: 10;
@@ -221,7 +224,8 @@
             align-items: center;
             padding: 15px 25px;
             border-radius: 100px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
         }
 
         .search-box input {
@@ -230,8 +234,31 @@
             outline: none;
             width: 100%;
             color: var(--text-main);
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             margin-left: 10px;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 15px;
+            padding: 15px 25px;
+            border-radius: 100px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .search-filters select, .search-filters input {
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.5);
+            padding: 8px 15px;
+            border-radius: 100px;
+            outline: none;
+            color: var(--text-main);
+            font-size: 1.1rem;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .search-filters select, .search-filters input { background: rgba(0,0,0,0.3); }
         }
 
         /* Media Grid */
@@ -268,7 +295,7 @@
         }
 
         .card-category {
-            font-size: 0.75rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: var(--apple-blue);
             text-transform: uppercase;
@@ -277,14 +304,14 @@
         }
 
         .card-title {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: 600;
             margin-bottom: 10px;
             line-height: 1.3;
         }
 
         .card-desc {
-            font-size: 0.9rem;
+            font-size: 1.1rem;
             color: var(--text-secondary);
             margin-bottom: 20px;
             flex-grow: 1;
@@ -344,7 +371,7 @@
         }
 
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem;}
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 1.1rem;}
         .form-control {
             width: 100%;
             padding: 12px 15px;
@@ -353,7 +380,7 @@
             background: rgba(255,255,255,0.5);
             color: var(--text-main);
             outline: none;
-            font-size: 1rem;
+            font-size: 1.1rem;
             transition: border 0.3s;
         }
         @media (prefers-color-scheme: dark) {
@@ -389,6 +416,7 @@
             align-items: center;
             gap: 10px;
             font-weight: 500;
+            font-size: 1.1rem;
         }
 
         .nav-item:hover, .nav-item.active {
@@ -418,20 +446,20 @@
             gap: 10px;
         }
 
-        .widget h3 { font-size: 0.9rem; color: var(--text-secondary); }
+        .widget h3 { font-size: 1.1rem; color: var(--text-secondary); margin: 0; }
         .widget .val { font-size: 2.5rem; font-weight: 700; }
 
         /* Table */
         .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        th, td { padding: 15px; border-bottom: 1px solid var(--glass-border); }
+        th, td { padding: 15px; border-bottom: 1px solid var(--glass-border); font-size: 1.1rem;}
         th { font-weight: 600; color: var(--text-secondary); }
         tr:hover td { background: rgba(0,0,0,0.02); }
         
         .badge {
             padding: 5px 10px;
             border-radius: 100px;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: 600;
         }
         .badge.active { background: rgba(52, 199, 89, 0.2); color: var(--success); }
@@ -450,14 +478,14 @@
             padding: 15px 25px; border-radius: var(--radius-sm);
             background: var(--glass-bg); backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
-            color: var(--text-main); font-weight: 500;
+            color: var(--text-main); font-weight: 500; font-size: 1.1rem;
             transform: translateX(120%); animation: slideIn 0.3s forwards;
         }
         @keyframes slideIn { to { transform: translateX(0); } }
         
         /* Footer */
         footer {
-            text-align: center; padding: 30px; color: var(--text-secondary); font-size: 0.9rem;
+            text-align: center; padding: 30px; color: var(--text-secondary); font-size: 1.1rem;
             border-top: 1px solid var(--glass-border); margin-top: 50px;
         }
 
@@ -499,7 +527,27 @@
         <div class="search-container container" id="mediaSection">
             <div class="search-box glass">
                 <span>🔎</span>
-                <input type="text" id="searchInput" placeholder="ค้นหาสื่อ, หมวดหมู่, หรือคำอธิบาย..." onkeyup="handleSearch()">
+                <input type="text" id="searchInput" placeholder="ค้นหาชื่อสื่อ, คีย์เวิร์ด, หรือคำอธิบาย..." onkeyup="handleSearch()">
+            </div>
+            <div class="search-filters glass">
+                <select id="filterGrade" onchange="handleSearch()">
+                    <option value="">-- ทุกระดับชั้น --</option>
+                    <option value="ปฐมวัย">ปฐมวัย</option>
+                    <option value="ป.1">ป.1</option>
+                    <option value="ป.2">ป.2</option>
+                    <option value="ป.3">ป.3</option>
+                    <option value="ป.4">ป.4</option>
+                    <option value="ป.5">ป.5</option>
+                    <option value="ป.6">ป.6</option>
+                    <option value="ม.1">ม.1</option>
+                    <option value="ม.2">ม.2</option>
+                    <option value="ม.3">ม.3</option>
+                    <option value="ม.4">ม.4</option>
+                    <option value="ม.5">ม.5</option>
+                    <option value="ม.6">ม.6</option>
+                    <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+                <input type="text" id="filterIndicator" placeholder="ค้นหาตัวชี้วัด เช่น ว 1.1..." onkeyup="handleSearch()">
             </div>
         </div>
 
@@ -582,18 +630,64 @@
                     <input type="hidden" id="formId">
                     <div class="form-group">
                         <label>ชื่อสื่อการสอน</label>
-                        <input type="text" id="formTitle" class="form-control" required>
+                        <input type="text" id="formTitleInput" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label>หมวดหมู่</label>
-                        <input type="text" id="formCategory" class="form-control" required placeholder="เช่น วิทยาศาสตร์, ภาษาอังกฤษ">
+                        <select id="formCategory" class="form-control" required>
+                            <option value="">-- เลือกหมวดหมู่ --</option>
+                            <option value="ภาษาไทย">ภาษาไทย</option>
+                            <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+                            <option value="วิทยาศาสตร์และเทคโนโลยี">วิทยาศาสตร์และเทคโนโลยี</option>
+                            <option value="สังคมศึกษา ศาสนา และวัฒนธรรม">สังคมศึกษา ศาสนา และวัฒนธรรม</option>
+                            <option value="สุขศึกษาและพลศึกษา">สุขศึกษาและพลศึกษา</option>
+                            <option value="ศิลปะ">ศิลปะ</option>
+                            <option value="การงานอาชีพ">การงานอาชีพ</option>
+                            <option value="ภาษาต่างประเทศ">ภาษาต่างประเทศ</option>
+                            <option value="ปฐมวัย">ปฐมวัย</option>
+                            <option value="พัฒนาผู้เรียน">พัฒนาผู้เรียน</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>คำอธิบาย</label>
+                        <label>ระดับชั้น</label>
+                        <select id="formGrade" class="form-control" required>
+                            <option value="">-- เลือกระดับชั้น --</option>
+                            <option value="ปฐมวัย">ปฐมวัย</option>
+                            <option value="ป.1">ป.1</option>
+                            <option value="ป.2">ป.2</option>
+                            <option value="ป.3">ป.3</option>
+                            <option value="ป.4">ป.4</option>
+                            <option value="ป.5">ป.5</option>
+                            <option value="ป.6">ป.6</option>
+                            <option value="ม.1">ม.1</option>
+                            <option value="ม.2">ม.2</option>
+                            <option value="ม.3">ม.3</option>
+                            <option value="ม.4">ม.4</option>
+                            <option value="ม.5">ม.5</option>
+                            <option value="ม.6">ม.6</option>
+                            <option value="อื่นๆ">อื่นๆ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ตัวชี้วัด (ถ้ามี)</label>
+                        <input type="text" id="formIndicator" class="form-control" placeholder="เช่น ว 1.1 ป.1/1">
+                    </div>
+                    <div class="form-group">
+                        <label style="display: flex; justify-content: space-between; align-items: center;">
+                            คำอธิบาย 
+                            <a href="https://gemini.google.com" target="_blank" style="font-size: 0.9rem; color: var(--apple-blue); text-decoration: none; display: flex; align-items: center; gap: 4px;">
+                                ✨ ให้ Gemini ช่วยเขียน
+                            </a>
+                        </label>
                         <textarea id="formDesc" class="form-control" rows="3" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label>URL รูปภาพปก (Thumbnail)</label>
+                        <label style="display: flex; justify-content: space-between; align-items: center;">
+                            URL รูปภาพปก (Thumbnail) 
+                            <a href="https://pic.in.th/logout#google_vignette" target="_blank" style="font-size: 0.9rem; color: var(--apple-blue); text-decoration: none; display: flex; align-items: center; gap: 4px;">
+                                ☁️ ฝากรูปที่นี่
+                            </a>
+                        </label>
                         <input type="url" id="formThumb" class="form-control" required>
                     </div>
                     <div class="form-group">
@@ -671,17 +765,15 @@
                 let url = `${SCRIPT_URL}?action=${action}`;
                 let options = { 
                     method: 'GET',
-                    redirect: 'follow' // ช่วยแก้ปัญหา Failed to fetch จาก Redirect
+                    redirect: 'follow'
                 };
 
-                // For Apps script CORS handling, complex POST needs care.
-                // Using standard POST with JSON.
                 if (data) {
                     options = {
                         method: 'POST',
-                        redirect: 'follow', // ช่วยแก้ปัญหา Failed to fetch จาก Redirect
+                        redirect: 'follow',
                         body: JSON.stringify(data),
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' } // 'text/plain' avoids preflight OPTIONS request issues in GAS
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                     };
                 }
 
@@ -713,24 +805,13 @@
            Public UI Functions
         ========================================= */
         async function fetchMediaData() {
-            // Mock data for immediate preview if API is slow or unconfigured
-            const mockData = [
-                { ID: '1', Title: 'เกมฝึกพิมพ์สัมผัส', Description: 'ฝึกพิมพ์ดีดภาษาไทยและอังกฤษผ่านเกมสนุกๆ', Category: 'คอมพิวเตอร์', Thumbnail: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60', Link: '#', CreatedDate: '2023-10-01', Status: 'Active' },
-                { ID: '2', Title: 'เรียนรู้อวกาศ 3D', Description: 'จำลองระบบสุริยะ 3 มิติ เพื่อการเรียนรู้วิทยาศาสตร์', Category: 'วิทยาศาสตร์', Thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60', Link: '#', CreatedDate: '2023-10-05', Status: 'Active' },
-                { ID: '3', Title: 'แบบทดสอบคณิตศาสตร์', Description: 'แบบฝึกหัดคณิต ป.1 - ป.6 พร้อมระบบตรวจอัตโนมัติ', Category: 'คณิตศาสตร์', Thumbnail: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60', Link: '#', CreatedDate: '2023-10-10', Status: 'Active' }
-            ];
-
-            // Show skeletons
             renderSkeletons();
-
-            // Try fetch from GAS
             const data = await apiRequest('getMedia');
             
             if (data && data.length > 0) {
                 state.media = data;
             } else {
-                // Fallback to mock data if empty or error for demo purpose
-                state.media = mockData;
+                state.media = [];
             }
             
             state.filteredMedia = state.media.filter(m => m.Status === 'Active');
@@ -751,7 +832,7 @@
             grid.innerHTML = '';
 
             if(state.filteredMedia.length === 0) {
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--text-secondary);">ไม่พบข้อมูลสื่อการสอน</div>`;
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--text-secondary); font-size: 1.2rem;">ไม่พบข้อมูลสื่อการสอน</div>`;
                 return;
             }
 
@@ -760,12 +841,16 @@
                 card.className = 'card glass';
                 card.innerHTML = `
                     <img src="${item.Thumbnail || 'https://via.placeholder.com/500x300?text=No+Image'}" alt="${item.Title}" class="card-img" loading="lazy">
-                    <div class="card-category">${item.Category}</div>
+                    <div class="card-category">${item.Category || '-'}</div>
                     <div class="card-title">${item.Title}</div>
+                    <div style="font-size: 0.95rem; color: var(--apple-blue); margin-bottom: 5px;">
+                        <span>📚 ${item.Grade || '-'}</span> 
+                        <span style="margin-left: 10px;">🎯 ${item.Indicator || '-'}</span>
+                    </div>
                     <div class="card-desc">${item.Description}</div>
                     <div class="card-footer">
-                        <span style="font-size: 0.8rem; color: var(--text-secondary);">📅 ${formatDate(item.CreatedDate)}</span>
-                        <a href="${item.Link}" target="_blank" class="btn btn-primary" style="padding: 5px 15px; font-size: 0.9rem;">เปิดสื่อ ↗</a>
+                        <span style="font-size: 0.9rem; color: var(--text-secondary);">📅 ${formatDate(item.CreatedDate)}</span>
+                        <a href="${item.Link}" target="_blank" class="btn btn-primary" style="padding: 5px 15px; font-size: 1rem;">เปิดสื่อ ↗</a>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -776,17 +861,23 @@
             clearTimeout(state.searchTimeout);
             state.searchTimeout = setTimeout(() => {
                 const query = document.getElementById('searchInput').value.toLowerCase();
+                const grade = document.getElementById('filterGrade').value;
+                const indicator = document.getElementById('filterIndicator').value.toLowerCase();
+                
                 const activeMedia = state.media.filter(m => m.Status === 'Active');
                 
-                if(!query) {
-                    state.filteredMedia = activeMedia;
-                } else {
-                    state.filteredMedia = activeMedia.filter(m => 
+                state.filteredMedia = activeMedia.filter(m => {
+                    const matchQuery = !query || 
                         (m.Title && m.Title.toLowerCase().includes(query)) || 
                         (m.Category && m.Category.toLowerCase().includes(query)) ||
-                        (m.Description && m.Description.toLowerCase().includes(query))
-                    );
-                }
+                        (m.Description && m.Description.toLowerCase().includes(query));
+                        
+                    const matchGrade = !grade || (m.Grade && m.Grade === grade);
+                    const matchIndicator = !indicator || (m.Indicator && m.Indicator.toLowerCase().includes(indicator));
+                    
+                    return matchQuery && matchGrade && matchIndicator;
+                });
+                
                 renderMediaCards();
             }, 300); // Debounce 300ms
         }
@@ -814,8 +905,7 @@
 
             const res = await apiRequest('login', { username: u, password: p });
             
-            // For Demo: Allow admin/admin if API fails
-            if (res || (u === 'admin' && p === 'admin123')) {
+            if (res) {
                 showToast('เข้าสู่ระบบสำเร็จ', 'success');
                 toggleModal('loginModal');
                 setAdminMode(true);
@@ -849,11 +939,9 @@
         }
 
         function switchAdminTab(tabName) {
-            // Hide all
             document.querySelectorAll('.admin-tab').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
             
-            // Show target
             document.getElementById(`tab-${tabName}`).style.display = 'block';
             event.currentTarget.classList.add('active');
         }
@@ -887,7 +975,7 @@
                 tr.innerHTML = `
                     <td><img src="${item.Thumbnail}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;"></td>
                     <td><strong>${item.Title}</strong></td>
-                    <td>${item.Category}</td>
+                    <td>${item.Category || '-'}</td>
                     <td><span class="badge ${badgeClass}">${item.Status}</span></td>
                     <td class="action-btns">
                         <button onclick="editMedia('${item.ID}')" title="แก้ไข">✏️</button>
@@ -905,10 +993,12 @@
             btn.disabled = true;
 
             const mediaData = {
-                ID: document.getElementById('formId').value || new Date().getTime().toString(), // Generate ID if new
-                Title: document.getElementById('formTitle').value,
+                ID: document.getElementById('formId').value || new Date().getTime().toString(),
+                Title: document.getElementById('formTitleInput').value,
                 Description: document.getElementById('formDesc').value,
                 Category: document.getElementById('formCategory').value,
+                Grade: document.getElementById('formGrade').value,
+                Indicator: document.getElementById('formIndicator').value,
                 Thumbnail: document.getElementById('formThumb').value,
                 Link: document.getElementById('formLink').value,
                 Status: document.getElementById('formStatus').value,
@@ -917,7 +1007,6 @@
 
             const action = document.getElementById('formId').value ? 'updateMedia' : 'addMedia';
             
-            // Mock Update local state instantly for UI responsiveness
             if(action === 'addMedia') {
                 state.media.unshift(mediaData);
             } else {
@@ -925,12 +1014,11 @@
                 if(idx > -1) state.media[idx] = {...state.media[idx], ...mediaData};
             }
 
-            // Send to GAS
             await apiRequest(action, mediaData);
             
             showToast('บันทึกข้อมูลเรียบร้อย', 'success');
             resetForm();
-            fetchMediaData(); // Refresh from server
+            fetchMediaData(); 
             switchAdminTab('manage');
             
             btn.innerText = 'บันทึกข้อมูล';
@@ -942,9 +1030,11 @@
             if(!item) return;
 
             document.getElementById('formId').value = item.ID;
-            document.getElementById('formTitle').value = item.Title;
+            document.getElementById('formTitleInput').value = item.Title;
             document.getElementById('formDesc').value = item.Description;
-            document.getElementById('formCategory').value = item.Category;
+            document.getElementById('formCategory').value = item.Category || '';
+            document.getElementById('formGrade').value = item.Grade || '';
+            document.getElementById('formIndicator').value = item.Indicator || '';
             document.getElementById('formThumb').value = item.Thumbnail;
             document.getElementById('formLink').value = item.Link;
             document.getElementById('formStatus').value = item.Status;
@@ -955,14 +1045,13 @@
 
         async function deleteMedia(id) {
             if(confirm('คุณแน่ใจหรือไม่ที่จะลบสื่อนี้?')) {
-                // Optimistic UI update
                 state.media = state.media.filter(m => m.ID != id);
                 renderAdminTable();
                 updateDashboardStats();
                 
                 await apiRequest('deleteMedia', { ID: id });
                 showToast('ลบข้อมูลเรียบร้อย', 'success');
-                fetchMediaData(); // Refresh to sync
+                fetchMediaData();
             }
         }
 
