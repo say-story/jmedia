@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>อ่านแล้วตอบได้! - สื่อการสอนภาษาไทย ป.1</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700;800&display=swap');
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0f2fe 0%, #dcfce7 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1e293b;
+        }
+
+        /* Header Style */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 12px 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            height: 55px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .title-container h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 800;
+            color: #0284c7;
+            line-height: 1.2;
+        }
+
+        .indicator-badge {
+            margin: 2px 0 0 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: #16a34a;
+            background-color: #f0fdf4;
+            padding: 2px 8px;
+            border-radius: 20px;
+            display: inline-block;
+            border: 1px solid #bbf7d0;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .status-badge {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .status-badge.score {
+            border-color: #38bdf8;
+            color: #0369a1;
+        }
+
+        .status-badge.stars {
+            border-color: #fde047;
+            color: #a16207;
+        }
+
+        /* Main Content Container */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 20px;
+        }
+
+        .game-card {
+            background: white;
+            width: 100%;
+            max-width: 750px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 35px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 4px solid #fff;
+        }
+
+        /* Utility Screens classes */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Start Screen Styling */
+        .welcome-emoji {
+            font-size: 70px;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .instruction-box {
+            background-color: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .instruction-box h3 {
+            margin-top: 0;
+            color: #334155;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .instruction-box ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #475569;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Buttons Styling */
+        .btn {
+            background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            font-size: 20px;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.5);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%);
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.5);
+        }
+
+        .btn-orange {
+            background: linear-gradient(180deg, #fb923c 0%, #ea580c 100%);
+            box-shadow: 0 6px 20px rgba(234, 88, 12, 0.4);
+        }
+
+        .btn-orange:hover {
+            box-shadow: 0 8px 25px rgba(234, 88, 12, 0.5);
+        }
+
+        /* Progress Bar Setup */
+        .progress-container {
+            margin-bottom: 25px;
+            background: #f1f5f9;
+            border-radius: 20px;
+            padding: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 6px;
+            padding: 0 10px;
+        }
+
+        .progress-bar-outer {
+            width: 100%;
+            background: #e2e8f0;
+            height: 16px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        /* Story Display Box */
+        .story-container {
+            background-color: #fffde7;
+            border: 3px dashed #fef08a;
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: left;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .story-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #854d0e;
+            margin-top: 0;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .story-body {
+            font-size: 19px;
+            line-height: 1.8;
+            color: #451a03;
+            text-indent: 40px;
+            margin: 0;
+            text-align: justify;
+        }
+
+        /* Question & Input Box */
+        .question-container {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .question-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #6366f1;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            display: inline-block;
+            background: #e0e7ff;
+            padding: 2px 10px;
+            border-radius: 10px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 6px 0 15px 0;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            gap: 10px;
+        }
+
+        .answer-input {
+            flex: 1;
+            padding: 14px 20px;
+            font-size: 18px;
+            border: 2px solid #cbd5e1;
+            border-radius: 15px;
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        .answer-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), inset 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        /* Feedback Section */
+        .feedback-container {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 20px;
+            text-align: left;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback-container.correct {
+            display: block;
+            background-color: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            color: #16a34a;
+        }
+
+        .feedback-container.incorrect {
+            display: block;
+            background-color: #fef2f2;
+            border: 2px solid #fca5a5;
+            color: #dc2626;
+        }
+
+        .feedback-title {
+            font-size: 19px;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feedback-explain {
+            font-size: 16px;
+            color: #475569;
+            margin: 0 0 15px 0;
+            line-height: 1.5;
+        }
+
+        /* Summary Screen Layout */
+        .summary-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #0284c7;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        .summary-subtitle {
+            font-size: 18px;
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .star-reward-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .star-animated {
+            font-size: 55px;
+            opacity: 0.2;
+            transform: scale(0.5);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .star-animated.earned {
+            opacity: 1;
+            transform: scale(1);
+            text-shadow: 0 4px 10px rgba(253, 224, 71, 0.5);
+        }
+
+        .score-board {
+            background: #f0fdfa;
+            border: 2px solid #99f6e4;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 25px auto;
+            max-width: 400px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .score-box {
+            background: white;
+            padding: 12px;
+            border-radius: 15px;
+            border: 1px solid #ccfbf1;
+        }
+
+        .score-box .val {
+            font-size: 26px;
+            font-weight: 800;
+            color: #0d9488;
+            display: block;
+        }
+
+        .score-box .lbl {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        /* Footer Style */
+        footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+                text-align: center;
+            }
+            .header-left {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .game-card {
+                padding: 20px 15px;
+                border-radius: 20px;
+            }
+            .story-body {
+                font-size: 17px;
+            }
+            .question-text {
+                font-size: 18px;
+            }
+            .input-wrapper {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .score-board {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="https://img1.pic.in.th/images/sayremove1.png" alt="Logo" class="logo">
+            <div class="title-container">
+                <h1>อ่านแล้วตอบได้!</h1>
+                <div class="indicator-badge">ตัวชี้วัด ท ๑.๑ ป.๑/๓</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-badge score">
+                <span>คะแนน:</span>
+                <span id="header-score">0</span>
+            </div>
+            <div class="status-badge stars">
+                <span>⭐</span>
+                <span id="header-stars">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="game-card">
+            
+            <div id="start-screen" class="screen active">
+                <div class="welcome-emoji">📖✨</div>
+                <h2>ยินดีต้อนรับเข้าสู่บทเรียนสุดสนุก!</h2>
+                <p style="font-size: 18px; color: #475569;">ฝึกทักษะการอ่านจับใจความและตอบคำถามสำหรับนักเรียนชั้น ป.1</p>
+                
+                <div class="instruction-box">
+                    <h3>💡 คำชี้แจงสำหรับนักเรียน:</h3>
+                    <ul>
+                        <li>ให้นักเรียนตั้งใจอ่านนิทานสั้นๆ ที่ปรากฏในแต่ละบทเรียน</li>
+                        <li>พิมพ์คำตอบลงในช่องว่างให้ใจความตรงกับเนื้อเรื่อง</li>
+                        <li>เมื่อตอบถูกจะได้รับคะแนนและสะสมดาวน่ารักๆ</li>
+                        <li>มีนิทานทั้งหมด 3 เรื่อง เรื่องละ 3 ข้อ รวมเป็น 9 ข้อครับ/ค่ะ</li>
+                    </ul>
+                </div>
+                
+                <button class="btn" onclick="startGame()">เริ่มเล่นเกมเลย! 🚀</button>
+            </div>
+
+            <div id="game-screen" class="screen">
+                <div class="progress-container">
+                    <div class="progress-text">
+                        <span id="progress-story-text">เรื่องที่ 1/3</span>
+                        <span id="progress-question-text">คำถามข้อที่ 1/3</span>
+                    </div>
+                    <div class="progress-bar-outer">
+                        <div id="progress-bar" class="progress-bar-inner"></div>
+                    </div>
+                </div>
+
+                <div class="story-container">
+                    <h3 class="story-title" id="story-title">ชื่อเรื่อง</h3>
+                    <p class="story-body" id="story-body">เนื้อเรื่องนิทาน...</p>
+                </div>
+
+                <div class="question-container">
+                    <span class="question-label" id="question-type-label">คำถาม</span>
+                    <p class="question-text" id="question-text">คำถามจะแสดงตรงนี้?</p>
+                    
+                    <div class="input-wrapper">
+                        <input type="text" id="answer-input" class="answer-input" placeholder="พิมพ์คำตอบของหนูที่นี่เลยจ้า..." autocomplete="off">
+                        <button id="submit-btn" class="btn btn-primary" onclick="submitAnswer()">ส่งคำตอบ 🎯</button>
+                    </div>
+                </div>
+
+                <div id="feedback-box" class="feedback-container">
+                    <h4 class="feedback-title" id="feedback-title">ผลลัพธ์</h4>
+                    <p class="feedback-explain" id="feedback-explain">คำอธิบาย...</p>
+                    <button id="next-btn" class="btn btn-orange" onclick="nextStep()">ข้อต่อไป ➡️</button>
+                </div>
+            </div>
+
+            <div id="summary-screen" class="screen">
+                <div class="welcome-emoji">🏆🎉</div>
+                <h2 class="summary-title">เก่งมากเลยเล่นจบแล้ว!</h2>
+                <p class="summary-subtitle">หนูทำภารกิจอ่านจับใจความสำเร็จเรียบร้อยแล้วครับ/ค่ะ</p>
+                
+                <div class="star-reward-container">
+                    <span class="star-animated" id="end-star-1">⭐</span>
+                    <span class="star-animated" id="end-star-2">⭐</span>
+                    <span class="star-animated" id="end-star-3">⭐</span>
+                </div>
+
+                <div class="score-board">
+                    <div class="score-box">
+                        <span class="val" id="summary-score">0</span>
+                        <span class="lbl">คะแนนรวมที่ได้</span>
+                    </div>
+                    <div class="score-box">
+                        <span class="val" id="summary-stars">0</span>
+                        <span class="lbl">ดาวที่สะสมได้</span>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="restartGame()">เล่นอีกรอบไหม? 🔄</button>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        Designed & Developed by Mansay.h © 2026
+    </footer>
+
+    <script>
+        // ข้อมูลนิทานและคำถาม (ฝังในโค้ด ทำงานแบบ Offline)
+        const storiesData = [
+            {
+                title: "🐱 เรื่องที่ 1: ลูกแมวสำลีจอมซน",
+                content: "วันหนึ่ง <b>ลูกแมวขาวชื่อสำลี</b> วิ่งเล่นไล่จับผีเสื้ออย่างสนุกสนานใน <b>สวนหลังบ้าน</b> มันกระโดดโลดเต้นจนไป <b>ชนกระถางต้นไม้ล้มแตก</b> คุณแม่เดินมาเห็นจึง <b>ดุสำลี</b> เพราะสำลีซนเกินไปและทำของเสียหาย ลูกแมวสำลีรู้สึกเสียใจจึงร้องเหมียวๆ เพื่อขอโทษคุณแม่",
+                questions: [
+                    {
+                        type: "ใคร (Who)",
+                        q: "ตัวละครหลักที่เป็นลูกแมวในเรื่องนี้มีชื่อว่าอะไร?",
+                        keywords: ["สำลี", "แมวสำลี", "ลูกแมวสำลี"],
+                        explain: "ตัวละครหลักในเรื่องคือ ลูกแมวสีขาวที่ชื่อว่า <b>'สำลี'</b> จ้า"
+                    },
+                    {
+                        type: "ที่ไหน (Where)",
+                        q: "เหตุการณ์ลูกแมวสำลีวิ่งเล่นจับผีเสื้อเกิดขึ้นที่ไหน?",
+                        keywords: ["สวน", "หลังบ้าน", "สวนหลังบ้าน"],
+                        explain: "ในเนื้อเรื่องบอกไว้ว่า สำลีไปวิ่งเล่นไล่จับผีเสื้อที่ <b>'สวนหลังบ้าน'</b> ครับ"
+                    },
+                    {
+                        type: "เพราะอะไร (Why)",
+                        q: "เพราะเหตุใดคุณแม่ถึงดุลูกแมวสำลี?",
+                        keywords: ["ซน", "แตก", "ชนกระถาง", "ทำของเสียหาย", "ดื้อ"],
+                        explain: "คุณแม่ดุสำลีเพราะ <b>'สำลีซนเกินไป'</b> หรือ <b>'วิ่งชนกระถางต้นไม้แตก'</b> นั่นเองจ้า"
+                    }
+                ]
+            },
+            {
+                title: "🐢 เรื่องที่ 2: การวิ่งแข่งในป่าใหญ่",
+                content: "ใน <b>ป่าใหญ่</b> แสนร่มรื่น <b>เจ้าเต่า</b> ชวน <b>กระต่าย</b> วิ่งแข่งกันเพื่อไปที่ <b>ลำธารใส</b> ระหว่างทางกระต่ายวิ่งนำไปไกลจึงชะล่าใจแวะ <b>นอนหลับใต้ต้นไม้ใหญ่</b> ส่วนเต่าเดินต้วมเตี้ยมอย่างตั้งใจไม่หยุดพัก ในที่สุดเต่าก็เดินไปถึงลำธารก่อนและกลายเป็นผู้ชนะ",
+                questions: [
+                    {
+                        type: "ใคร (Who)",
+                        q: "ใครเป็นผู้ชนะในการแข่งขันวิ่งแข่งครั้งนี้?",
+                        keywords: ["เต่า", "เจ้าเต่า", "ตัวเต่า"],
+                        explain: "ผู้ชนะในเรื่องนี้ก็คือ <b>'เจ้าเต่า'</b> เพราะมีความตั้งใจและเดินไม่ยอมหยุดพักเลย"
+                    },
+                    {
+                        type: "ทำอะไร (What)",
+                        q: "กระต่ายแวะทำอะไรใต้ต้นไม้ใหญ่จนทำให้เดินตามเต่าไม่ทัน?",
+                        keywords: ["นอน", "หลับ", "นอนหลับ", "พักผ่อน"],
+                        explain: "กระต่ายชะล่าใจคิดว่าเต่าเดินช้า เลยแวะ <b>'นอนหลับ'</b> ใต้ต้นไม้ใหญ่จนแพ้ไปจ้า"
+                    },
+                    {
+                        type: "ที่ไหน (Where)",
+                        q: "เรื่องราวการแข่งขันวิ่งแข่งในนิทานเรื่องนี้เกิดขึ้นที่ไหน?",
+                        keywords: ["ป่า", "ในป่า", "ป่าใหญ่"],
+                        explain: "ตั้งแต่ต้นเรื่องระบุไว้ชัดเจนเลยว่า เหตุการณ์นี้เกิดขึ้นใน <b>'ป่าใหญ่'</b> ครับ"
+                    }
+                ]
+            },
+            {
+                title: "🐣 เรื่องที่ 3: น้องพลอยเด็กดีมีเมตตา",
+                content: "ในวันหยุดตอนเช้า <b>น้องพลอย</b> ช่วยคุณยาย <b>ให้อาหารไก่</b> อย่างเพลิดเพลินอยู่ที่ <b>เล้าไก่ข้างบ้าน</b> ทันใดนั้นมี <b>ลูกนกตัวเล็กตกลงมาจากรัง</b> บนต้นไม้ น้องพลอยรีบเข้าไปอุ้มลูกนกกลับคืนใส่รังอย่างปลอดภัย คุณยายเห็นแล้วยิ้มชอบใจและ <b>ชมเชยพลอย</b> ว่าเป็นเด็กดีมีเมตตาต่อสัตว์",
+                questions: [
+                    {
+                        type: "ใคร (Who)",
+                        q: "ใครเป็นเด็กใจดีที่ช่วยอุ้มลูกนกกลับคืนรังอย่างปลอดภัย?",
+                        keywords: ["พลอย", "น้องพลอย", "เด็กหญิงพลอย"],
+                        explain: "เด็กหญิงผู้มีใจเมตตาช่วยลูกนกในเรื่องนี้ก็คือ <b>'น้องพลอย'</b> นั่นเองจ้า"
+                    },
+                    {
+                        type: "ทำอะไร (What)",
+                        q: "ในตอนแรก น้องพลอยกำลังช่วยคุณยายทำงานอะไรอยู่ที่เล้าไก่?",
+                        keywords: ["ให้อาหารไก่", "เลี้ยงไก่", "ให้ข้าวไก่", "ให้อาหาร"],
+                        explain: "น้องพลอยกำลังช่วยคุณยาย <b>'ให้อาหารไก่'</b> อย่างเพลิดเพลินอยู่ที่เล้าไก่ข้างบ้านจ้า"
+                    },
+                    {
+                        type: "เพราะอะไร (Why)",
+                        q: "เพราะเหตุใดคุณยายถึงยิ้มชอบใจและชมเชยน้องพลอย?",
+                        keywords: ["ช่วยนก", "ช่วยลูกนก", "มีเมตตา", "ใจดี", "จับนกใส่รัง"],
+                        explain: "คุณยายชมพลอยเพราะพลอยเป็นเด็กดี <b>'ช่วยลูกนกที่ตกจากรัง'</b> หรือเป็นเด็ก <b>'มีเมตตาต่อสัตว์'</b> ครับ"
+                    }
+                ]
+            }
+        ];
+
+        // ตัวแปรควบคุมสถานะของเกม
+        let score = 0;
+        let stars = 0;
+        let currentStory = 0;
+        let currentQuestion = 0;
+        let isAnswered = false;
+
+        // ฟังก์ชันเริ่มเกม
+        function startGame() {
+            score = 0;
+            stars = 0;
+            currentStory = 0;
+            currentQuestion = 0;
+            isAnswered = false;
+            
+            updateHeader();
+            showScreen('game-screen');
+            loadQuestion();
+        }
+
+        // ฟังก์ชันแสดงหน้าจอที่ต้องการ
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // ฟังก์ชันอัปเดตส่วนหัวข้อ (Header Score & Stars)
+        function updateHeader() {
+            document.getElementById('header-score').innerText = score;
+            document.getElementById('header-stars').innerText = stars;
+        }
+
+        // ฟังก์ชันโหลดข้อมูลคำถามปัจจุบันขึ้นจอ
+        function loadQuestion() {
+            isAnswered = false;
+            document.getElementById('feedback-box').className = "feedback-container"; // ซ่อนกล่องตรวจคำตอบ
+            document.getElementById('answer-input').value = ""; // เคลียร์ช่องป้อนคำตอบ
+            document.getElementById('answer-input').disabled = false;
+            document.getElementById('submit-btn').disabled = false;
+
+            const story = storiesData[currentStory];
+            const question = story.questions[currentQuestion];
+
+            // แสดงเนื้อเรื่อง
+            document.getElementById('story-title').innerHTML = story.title;
+            document.getElementById('story-body').innerHTML = story.content;
+
+            // แสดงคำถาม
+            document.getElementById('question-type-label').innerText = `คำถามแนว: ${question.type}`;
+            document.getElementById('question-text').innerText = question.q;
+
+            // อัปเดต Progress Bar
+            document.getElementById('progress-story-text').innerText = `เรื่องที่ ${currentStory + 1}/${storiesData.length}`;
+            document.getElementById('progress-question-text').innerText = `คำถามข้อที่ ${currentQuestion + 1}/${story.questions.length}`;
+            
+            // คำนวณเปอร์เซ็นต์ความคืบหน้ารวม (ทั้งหมดมี 9 ข้อ)
+            const totalQuestions = storiesData.length * 3;
+            const currentProgressIndex = (currentStory * 3) + currentQuestion;
+            const progressPercent = (currentProgressIndex / totalQuestions) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+        }
+
+        // ฟังก์ชันตรวจคำตอบจากกล่องพิมพ์ (Keyword-based Matching)
+        function submitAnswer() {
+            const userInput = document.getElementById('answer-input').value.trim();
+            
+            // แจ้งเตือนถ้าเด็กยังไม่ได้พิมพ์อะไรเลย
+            if (userInput === "") {
+                alert("หนูๆ อย่าลืมพิมพ์คำตอบก่อนส่งนะจ๊ะ! ✏️");
+                return;
+            }
+
+            isAnswered = true;
+            document.getElementById('answer-input').disabled = true;
+            document.getElementById('submit-btn').disabled = true;
+
+            const question = storiesData[currentStory].questions[currentQuestion];
+            
+            // ตรวจสอบว่าคำตอบของผู้เล่นตรงกับ Keywords เฉลยหรือไม่
+            let isCorrect = false;
+            for (let kw of question.keywords) {
+                if (userInput.includes(kw)) {
+                    isCorrect = true;
+                    break;
+                }
+            }
+
+            const feedbackBox = document.getElementById('feedback-box');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackExplain = document.getElementById('feedback-explain');
+            const nextBtn = document.getElementById('next-btn');
+
+            // เปลี่ยนข้อความบนปุ่มถ้าเป็นข้อสุดท้าย
+            if (currentStory === storiesData.length - 1 && currentQuestion === 2) {
+                nextBtn.innerText = "ดูผลคะแนนรวม 🏆";
+            } else {
+                nextBtn.innerText = "ข้อต่อไป ➡️";
+            }
+
+            if (isCorrect) {
+                // กรณีตอบถูกใจความตรงเฉลย
+                score += 10;
+                stars += 1;
+                updateHeader();
+
+                feedbackBox.className = "feedback-container correct";
+                feedbackTitle.innerHTML = "ถูกต้องแล้วจ้า! 🎉 เก่งมากๆ เลย 👍";
+                feedbackExplain.innerHTML = `<b>คำอธิบาย:</b> ${question.explain} (+10 คะแนน, +1 ดาว ⭐)`;
+            } else {
+                // กรณีตอบยังไม่ตรงใจความหลัก
+                feedbackBox.className = "feedback-container incorrect";
+                feedbackTitle.innerHTML = "ยังไม่ถูกต้องนะจ๊ะคนดี 💡 ไม่เป็นไรนะลองดูใหม่";
+                feedbackExplain.innerHTML = `<b>แนวคำตอบที่ถูกต้องคือ:</b> ${question.explain} (พยายามเข้าไว้ในข้อต่อไปนะ!)`;
+            }
+        }
+
+        // ฟังก์ชันไปขั้นตอน/ข้อถัดไป
+        function nextStep() {
+            currentQuestion++;
+            
+            // ถ้านิทานเรื่องนี้ตอบครบ 3 ข้อแล้ว ให้ขึ้นนิทานเรื่องใหม่
+            if (currentQuestion > 2) {
+                currentQuestion = 0;
+                currentStory++;
+            }
+
+            // ถ้านิทานหมดทุกเรื่องแล้ว ให้ไปหน้าสรุปผล
+            if (currentStory >= storiesData.length) {
+                showSummaryScreen();
+            } else {
+                loadQuestion();
+            }
+        }
+
+        // ฟังก์ชันแสดงหน้าสรุปผลการเล่นพร้อมให้ดาวสะสมตามเกณฑ์
+        function showSummaryScreen() {
+            // อัปเดตแถบความคืบหน้าให้เต็ม 100%
+            document.getElementById('progress-bar').style.width = `100%`;
+            
+            showScreen('summary-screen');
+            
+            document.getElementById('summary-score').innerText = score;
+            document.getElementById('summary-stars').innerText = stars;
+
+            // รีเซ็ตคลาสของดาวอนิเมชันก่อน
+            document.getElementById('end-star-1').classList.remove('earned');
+            document.getElementById('end-star-2').classList.remove('earned');
+            document.getElementById('end-star-3').classList.remove('earned');
+
+            // เกณฑ์การให้รางวัลดาวประดับใจ (คะแนนเต็มสูงสุดคือ 90 คะแนน, ดาว 9 ดวง)
+            // แบ่งเกณฑ์ดาว 3 ระดับบนหน้าสรุปผล:
+            // ได้ดาว 7-9 ดวง -> ได้ 3 ดาวใหญ่
+            // ได้ดาว 4-6 ดวง -> ได้ 2 ดาวใหญ่
+            // ได้ดาว 1-3 ดวง -> ได้ 1 ดาวใหญ่
+            setTimeout(() => {
+                if (stars >= 1) {
+                    document.getElementById('end-star-1').classList.add('earned');
+                }
+                if (stars >= 4) {
+                    document.getElementById('end-star-2').classList.add('earned');
+                }
+                if (stars >= 7) {
+                    document.getElementById('end-star-3').classList.add('earned');
+                }
+            }, 300);
+        }
+
+        // ฟังก์ชันรีสตาร์ทเพื่อเล่นใหม่อีกครั้ง
+        function restartGame() {
+            showScreen('start-screen');
+            score = 0;
+            stars = 0;
+            updateHeader();
+        }
+    </script>
+</body>
+</html>
