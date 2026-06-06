@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เติมตัวเลขบนเส้นจำนวน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #E0F2F1; /* สีเขียวมินต์พาสเทล สดชื่น */
+            --line-color: #0D47A1; /* เส้นจำนวนสีน้ำเงินเข้ม */
+            --text-color: #1A237E;
+            --yellow-blank: #FFEB3B;
+            --green-correct: #4CAF50;
+            --red-wrong: #F44336;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background-color: #FFFFFF;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left h1 {
+            font-size: 1.8rem;
+            color: #00796B;
+            font-weight: 700;
+        }
+
+        .scoreboard {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: #E0F2F1;
+            padding: 5px 15px;
+            border-radius: 30px;
+            border: 2px solid #004D40;
+        }
+
+        .star-reward {
+            color: #FFB300;
+        }
+
+        /* Difficulty Selector */
+        .difficulty-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px auto 10px auto;
+            padding: 0 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .btn-diff {
+            flex: 1;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            font-family: inherit;
+            border-radius: 15px;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+            transition: transform 0.1s;
+            text-align: center;
+        }
+
+        .btn-diff:active { transform: translateY(3px); box-shadow: none; }
+        .diff-easy { background-color: #4CAF50; }
+        .diff-medium { background-color: #FFC107; color: #3E2723; }
+        .diff-hard { background-color: #F44336; }
+        
+        .btn-diff.active {
+            outline: 4px solid #004D40;
+            transform: scale(1.05);
+        }
+
+        /* Main Game Layout */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .instruction {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-align: center;
+            background: rgba(255,255,255,0.7);
+            padding: 5px 20px;
+            border-radius: 20px;
+        }
+
+        /* Number Line Styling */
+        .number-line-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+        }
+
+        .number-line {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            min-width: 800px;
+            padding: 0 40px;
+        }
+
+        /* The horizontal main line */
+        .number-line::before {
+            content: '';
+            position: absolute;
+            top: 50px; /* Aligned with ticks */
+            left: 40px;
+            right: 40px;
+            height: 8px;
+            background-color: var(--line-color);
+            border-radius: 4px;
+            z-index: 1;
+        }
+
+        .number-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        /* Top element: can be a static number or a slot */
+        .node-top {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .static-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #0D47A1;
+        }
+
+        .blank-slot {
+            width: 55px;
+            height: 55px;
+            background-color: var(--yellow-blank);
+            border: 3px dashed #F57F17;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #F57F17;
+            transition: all 0.2s;
+        }
+
+        .blank-slot.correct {
+            background-color: var(--green-correct);
+            border: 3px solid #1B5E20;
+            color: white;
+            box-shadow: 0 4px 0 #1B5E20;
+            cursor: default;
+        }
+
+        .blank-slot.wrong {
+            background-color: var(--red-wrong);
+            border: 3px solid #B71C1C;
+            color: white;
+            box-shadow: 0 4px 0 #B71C1C;
+        }
+
+        /* Middle tick line */
+        .node-tick {
+            width: 6px;
+            height: 20px;
+            background-color: var(--line-color);
+            border-radius: 3px;
+        }
+
+        /* Bottom labels for numbers (Arabic + Thai) */
+        .node-bottom {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .num-arabic { font-size: 1.4rem; color: #333; }
+        .num-thai { font-size: 1.2rem; color: #666; }
+
+        /* Options Blocks Area */
+        .options-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .option-block {
+            min-width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #FF7043 0%, #F4511E 100%);
+            color: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: grab;
+            box-shadow: 0 6px 0 #BF360C;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .option-block:active { cursor: grabbing; }
+        
+        .option-block.selected {
+            outline: 4px solid #004D40;
+            transform: translateY(-5px);
+        }
+
+        .option-block.placed {
+            opacity: 0.3;
+            cursor: default;
+            pointer-events: none;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Navigation Buttons */
+        .btn-action {
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            font-family: inherit;
+            border-radius: 50px;
+            cursor: pointer;
+            color: white;
+            background: linear-gradient(to bottom, #00ACC1, #00838F);
+            box-shadow: 0 6px 0 #006064;
+            transition: all 0.1s;
+        }
+        .btn-action:active { transform: translateY(4px); box-shadow: 0 2px 0 #006064; }
+
+        /* Popup / Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: scale(0.7);
+            transition: transform 0.3s ease;
+            border: 5px solid #4CAF50;
+        }
+
+        .modal-overlay.open .modal-content { transform: scale(1); }
+
+        .modal-content h2 { font-size: 2.5rem; color: #2E7D32; margin-bottom: 15px; }
+        .modal-content p { font-size: 1.6rem; margin-bottom: 25px; }
+        .modal-stars { font-size: 3.5rem; color: #FFB300; margin-bottom: 20px; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #E0E0E0;
+            color: #757575;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        /* Animations */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .shake { animation: shake 0.4s ease-in-out; }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .pop { animation: pop 0.3s ease-out; }
+
+        .star-particle {
+            position: fixed;
+            pointer-events: none;
+            color: #FFD700;
+            font-size: 1.5rem;
+            z-index: 999;
+            animation: explode 0.6s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(0.5); opacity: 0; }
+        }
+
+        /* Falling stars effect inside popup */
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(300px) rotate(360deg); opacity: 0; }
+        }
+        .falling-star {
+            position: absolute;
+            color: #FFB300;
+            font-size: 2rem;
+            animation: fall 1.5s linear infinite;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="https://img1.pic.in.th/images/sayremove1.png" style="height:36px;" alt="logo">
+            <h1>เติมตัวเลขบนเส้นจำนวน</h1>
+        </div>
+        <div class="scoreboard">
+            <span>คะแนน: <span id="totalScore">0</span></span>
+            <span class="star-reward">⭐ <span id="totalStars">0</span></span>
+        </div>
+    </header>
+
+    <div class="difficulty-container">
+        <button class="btn-diff diff-easy active" onclick="changeDifficulty('easy')">ง่าย (0-10)</button>
+        <button class="btn-diff diff-medium" onclick="changeDifficulty('medium')">กลาง (0-20)</button>
+        <button class="btn-diff diff-hard" onclick="changeDifficulty('hard')">ยาก (0-100)</button>
+    </div>
+
+    <main>
+        <div class="instruction">💡 วิธีเล่น: กดเลือกตัวเลขด้านล่าง แล้วกดที่ช่อง "?" ให้ถูกต้องนะจ๊ะ</div>
+
+        <div class="number-line-wrapper">
+            <div class="number-line" id="numberLine">
+                </div>
+        </div>
+
+        <div class="options-container" id="optionsContainer">
+            </div>
+
+        <button class="btn-action" onclick="initGame()">🔄 โจทย์ใหม่</button>
+    </main>
+
+    <div class="modal-overlay" id="winModal">
+        <div class="modal-content" style="position: relative; overflow: hidden;">
+            <div id="fallingStarsContainer"></div>
+            <h2>🎉 ยอดเยี่ยมไปเลย! 🎉</h2>
+            <p>หนูๆ เติมเส้นจำนวนได้ถูกต้องครบถ้วนแล้วจ้า</p>
+            <div class="modal-stars" id="modalStarsDisplay">⭐⭐⭐</div>
+            <button class="btn-action" onclick="closeWinModal()">เล่นรอบต่อไป ➔</button>
+        </div>
+    </div>
+
+    <footer>
+        Designed & Developed by Mansay.h © 2026
+    </footer>
+
+    <script>
+        // Game Configuration & State
+        let currentDifficulty = 'easy';
+        let score = 0;
+        let totalStars = 0;
+        let roundMistakes = 0;
+        let selectedNumber = null;
+        let selectedOptionElement = null;
+
+        let numberLineData = []; // Array ของตัวเลขบนเส้น
+        let hiddenIndices = [];  // เก็บตำแหน่งที่ถูกซ่อน
+
+        const thaiNumbers = ['๐', '๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙'];
+
+        // แปลงเลขอารบิกเป็นเลขไทย
+        function toThaiNum(num) {
+            return num.toString().replace(/[0-9]/g, match => thaiNumbers[match]);
+        }
+
+        // Web Audio API สำหรับสังเคราะห์เสียง Effect
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playTone(freq, type, duration, startTime = 0) {
+            if (!audioCtx) initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + startTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + startTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + startTime + duration);
+                osc.stop(audioCtx.currentTime + startTime + duration);
+            } catch(e) {}
+        }
+
+        function playSelectSound() { playTone(500, 'sine', 0.08); }
+        function playCorrectSound() {
+            playTone(523.25, 'sine', 0.1, 0); // C5
+            playTone(659.25, 'sine', 0.1, 0.08); // E5
+            playTone(783.99, 'sine', 0.2, 0.16); // G5
+        }
+        function playWrongSound() { playTone(180, 'triangle', 0.25); }
+        function playWinFanfare() {
+            playTone(523.25, 'sine', 0.15, 0);
+            playTone(659.25, 'sine', 0.15, 0.15);
+            playTone(783.99, 'sine', 0.15, 0.3);
+            playTone(1046.50, 'sine', 0.4, 0.45); // C6
+        }
+
+        // เปลี่ยนระดับความยาก
+        function changeDifficulty(mode) {
+            currentDifficulty = mode;
+            document.querySelectorAll('.btn-diff').forEach(btn => btn.classList.remove('active'));
+            if(mode === 'easy') document.querySelector('.diff-easy').classList.add('active');
+            if(mode === 'medium') document.querySelector('.diff-medium').classList.add('active');
+            if(mode === 'hard') document.querySelector('.diff-hard').classList.add('active');
+            initGame();
+        }
+
+        // เริ่มเกมรอบใหม่
+        function initGame() {
+            numberLineData = [];
+            hiddenIndices = [];
+            selectedNumber = null;
+            selectedOptionElement = null;
+            roundMistakes = 0;
+
+            let min = 0, max = 10, step = 1, hideCount = 3;
+
+            if (currentDifficulty === 'medium') {
+                max = 20;
+                hideCount = 4;
+            } else if (currentDifficulty === 'hard') {
+                max = 100;
+                step = 10;
+                hideCount = 5;
+            }
+
+            // สร้างชุดตัวเลขบนเส้นจำนวน
+            for (let i = min; i <= max; i += step) {
+                numberLineData.push({
+                    value: i,
+                    isHidden: false,
+                    isCorrect: false
+                });
+            }
+
+            // สุ่มตำแหน่งเพื่อซ่อนตัวเลข
+            while (hiddenIndices.length < hideCount) {
+                let randIndex = Math.floor(Math.random() * numberLineData.length);
+                if (!hiddenIndices.includes(randIndex)) {
+                    hiddenIndices.push(randIndex);
+                    numberLineData[randIndex].isHidden = true;
+                }
+            }
+
+            renderNumberLine();
+            renderOptions();
+        }
+
+        // วาดเส้นจำนวนบนหน้าจอ
+        function renderNumberLine() {
+            const lineContainer = document.getElementById('numberLine');
+            lineContainer.innerHTML = '';
+
+            numberLineData.forEach((node, index) => {
+                const nodeDiv = document.createElement('div');
+                nodeDiv.className = 'number-node';
+
+                // ด้านบน: ตัวเลข หรือ กล่องว่าง ?
+                const topDiv = document.createElement('div');
+                topDiv.className = 'node-top';
+
+                if (node.isHidden) {
+                    const slot = document.createElement('div');
+                    slot.className = 'blank-slot';
+                    slot.innerText = '?';
+                    slot.dataset.index = index;
+                    
+                    // ระบบคลิกเพื่อวางคำตอบ
+                    slot.onclick = () => handleSlotClick(slot, index);
+                    
+                    // รองรับ HTML5 Drag & Drop
+                    slot.ondragover = (e) => e.preventDefault();
+                    slot.ondrop = (e) => {
+                        e.preventDefault();
+                        const val = parseInt(e.dataTransfer.getData('text/plain'));
+                        evaluateAnswer(slot, index, val);
+                    };
+
+                    topDiv.appendChild(slot);
+                } else {
+                    const staticNum = document.createElement('div');
+                    staticNum.className = 'static-number';
+                    staticNum.innerText = node.value;
+                    topDiv.appendChild(staticNum);
+                }
+
+                // ตรงกลาง: ขีดเส้นจำนวน
+                const tickDiv = document.createElement('div');
+                tickDiv.className = 'node-tick';
+
+                // ด้านล่าง: ป้ายบอกตัวเลขคำใบ้ (เลขอารบิกคู่เลขไทย)
+                const bottomDiv = document.createElement('div');
+                bottomDiv.className = 'node-bottom';
+                bottomDiv.innerHTML = `
+                    <div class="num-arabic">${node.value}</div>
+                    <div class="num-thai">${toThaiNum(node.value)}</div>
+                `;
+
+                nodeDiv.appendChild(topDiv);
+                nodeDiv.appendChild(tickDiv);
+                nodeDiv.appendChild(bottomDiv);
+                lineContainer.appendChild(nodeDiv);
+            });
+        }
+
+        // วาดกล่องตัวเลือกด้านล่าง
+        function renderOptions() {
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            // ดึงค่าคำตอบที่ถูกต้องจากดัชนีที่ถูกซ่อน
+            let answers = hiddenIndices.map(idx => numberLineData[idx].value);
+            
+            // สับเปลี่ยนตำแหน่งคำตอบ (Shuffle) เพื่อความท้าทาย
+            answers.sort(() => Math.random() - 0.5);
+
+            answers.forEach(val => {
+                const block = document.createElement('div');
+                block.className = 'option-block';
+                block.innerText = val;
+                block.draggable = true;
+                block.dataset.value = val;
+
+                // เหตุการณ์การคลิกเลือก (เพื่อไปคลิกวาง)
+                block.onclick = (e) => {
+                    initAudio();
+                    playSelectSound();
+                    if (selectedOptionElement) {
+                        selectedOptionElement.classList.remove('selected');
+                    }
+                    selectedNumber = val;
+                    selectedOptionElement = block;
+                    block.classList.add('selected');
+                };
+
+                // เหตุการณ์ลาก (Drag)
+                block.ondragstart = (e) => {
+                    initAudio();
+                    selectedNumber = val;
+                    selectedOptionElement = block;
+                    e.dataTransfer.setData('text/plain', val);
+                };
+
+                optionsContainer.appendChild(block);
+            });
+        }
+
+        // จัดการเมื่อเด็กกดคลิกที่ช่องว่าง "?" เพื่อใส่คำตอบ
+        function handleSlotClick(slotElement, index) {
+            if (numberLineData[index].isCorrect) return; // หากถูกแล้วห้ามกดอีก
+            
+            if (selectedNumber === null) {
+                alert('กรุณากดเลือกตัวเลขสีส้มด้านล่างก่อนนะเด็กๆ!');
+                return;
+            }
+
+            evaluateAnswer(slotElement, index, selectedNumber);
+        }
+
+        // ตรวจคำตอบที่ส่งเข้ามา
+        function evaluateAnswer(slotElement, index, submittedValue) {
+            const node = numberLineData[index];
+            
+            if (node.value === submittedValue) {
+                // ตอบถูก!
+                playCorrectSound();
+                node.isCorrect = true;
+                slotElement.innerText = node.value;
+                slotElement.className = 'blank-slot correct pop';
+                
+                // เอฟเฟกต์ดาวกระจายรอบๆ ช่องที่ตอบถูก
+                const rect = slotElement.getBoundingClientRect();
+                createStarBurst(rect.left + rect.width/2, rect.top + rect.height/2);
+
+                // ซ่อนบล็อกตัวเลือกที่นำมาวางถูกต้องแล้ว
+                if (selectedOptionElement && parseInt(selectedOptionElement.dataset.value) === submittedValue) {
+                    selectedOptionElement.classList.add('placed');
+                }
+
+                // รีเซ็ตสถานะการเลือกชั่วคราว
+                selectedNumber = null;
+                selectedOptionElement = null;
+
+                score += 10;
+                document.getElementById('totalScore').innerText = score;
+
+                // ตรวจสอบว่าเติมครบทุกช่องบนเส้นจำนวนหรือยัง
+                checkRoundCompletion();
+            } else {
+                // ตอบผิด!
+                playWrongSound();
+                roundMistakes++;
+                slotElement.className = 'blank-slot wrong shake';
+                
+                // ถอดคลาสผิดออกหลังจากแอนิเมชันสั่นจบลง
+                setTimeout(() => {
+                    if (!node.isCorrect) {
+                        slotElement.className = 'blank-slot';
+                    }
+                }, 400);
+            }
+        }
+
+        // เอฟเฟกต์แอนิเมชันดาวระเบิดกระจาย
+        function createStarBurst(x, y) {
+            for (let i = 0; i < 12; i++) {
+                const star = document.createElement('div');
+                star.className = 'star-particle';
+                star.innerHTML = '★';
+                star.style.left = x + 'px';
+                star.style.top = y + 'px';
+                
+                // กำหนดทิศทางกระจายตัวแบบสุ่มด้วยตัวแปร CSS
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 50 + Math.random() * 80;
+                star.style.setProperty('--x', Math.cos(angle) * distance + 'px');
+                star.style.setProperty('--y', Math.sin(angle) * distance + 'px');
+
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), 600);
+            }
+        }
+
+        // ตรวจสอบว่าเคลียร์ครบหรือยัง
+        function checkRoundCompletion() {
+            const isAllCorrect = hiddenIndices.every(idx => numberLineData[idx].isCorrect);
+            if (isAllCorrect) {
+                setTimeout(() => {
+                    showWinModal();
+                }, 500);
+            }
+        }
+
+        // แสดงพ็อพพัพแสดงความยินดี
+        function showWinModal() {
+            playWinFanfare();
+            
+            // คำนวณดาวรางวัลในรอบนี้ตามจำนวนที่ตอบผิด
+            let starsEarned = 3;
+            if (roundMistakes > 0 && roundMistakes <= 2) starsEarned = 2;
+            if (roundMistakes > 2) starsEarned = 1;
+
+            totalStars += starsEarned;
+            document.getElementById('totalStars').innerText = totalStars;
+
+            // ปรับการแสดงผลดาวในพ็อพพัพ
+            let starsString = '';
+            for(let i=0; i<starsEarned; i++) starsString += '⭐';
+            document.getElementById('modalStarsDisplay').innerText = starsString;
+
+            // เริ่มเอฟเฟกต์ดาวร่วงในพ็อพพัพ
+            startFallingStars();
+
+            document.getElementById('winModal').classList.add('open');
+        }
+
+        function closeWinModal() {
+            document.getElementById('winModal').classList.remove('open');
+            stopFallingStars();
+            initGame(); // สุ่มรอบใหม่ทันที
+        }
+
+        // จัดการดาวร่วงเฉลิมฉลอง
+        let fallingStarsInterval;
+        function startFallingStars() {
+            const container = document.getElementById('fallingStarsContainer');
+            fallingStarsInterval = setInterval(() => {
+                const star = document.createElement('div');
+                star.className = 'falling-star';
+                star.innerHTML = '★';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.animationDuration = (1 + Math.random() * 1) + 's';
+                container.appendChild(star);
+                setTimeout(() => star.remove(), 1500);
+            }, 150);
+        }
+
+        function stopFallingStars() {
+            clearInterval(fallingStarsInterval);
+            document.getElementById('fallingStarsContainer').innerHTML = '';
+        }
+
+        // ผูกสิทธิ์เสียงเข้ากับการกระทำแรกเพื่อรองรับนโยบายเบราว์เซอร์
+        window.onload = () => {
+            initGame();
+            document.body.addEventListener('click', initAudio, { once: true });
+            document.body.addEventListener('touchstart', initAudio, { once: true });
+        };
+    </script>
+</body>
+</html>
